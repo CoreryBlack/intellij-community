@@ -1,0 +1,111 @@
+:root {
+  /* === IntelliJ IDEA New UI Dark Theme === */
+  --ide-bg-main: #1E1F22;
+  --ide-bg-panel: #2B2D30;
+  --ide-bg-toolbar: #2B2D30;
+  --ide-bg-statusbar: #1E1F22;
+  --ide-bg-input: #2B2D30;
+  --ide-bg-popup: #2B2D30;
+  --ide-bg-card: #2B2D30;
+
+  --ide-bg-hover: rgba(255, 255, 255, 0.06);
+  --ide-bg-active: rgba(255, 255, 255, 0.10);
+  --ide-bg-selected: rgba(89, 157, 246, 0.18);
+  --ide-bg-tooltip: #383B40;
+
+  --ide-border: rgba(255, 255, 255, 0.08);
+  --ide-border-focus: #3574F0;
+  --ide-border-subtle: rgba(255, 255, 255, 0.05);
+
+  --ide-text-primary: #CED0D6;
+  --ide-text-secondary: #8C8F94;
+  --ide-text-disabled: #545659;
+  --ide-text-accent: #FFFFFF;
+
+  --ide-accent-blue: #3574F0;
+  --ide-accent-blue-light: #589DF6;
+  --ide-accent-green: #499C54;
+  --ide-accent-orange: #DF8842;
+  --ide-accent-red: #DB4345;
+  --ide-accent-purple: #9876AA;
+  --ide-accent-cyan: #56A8D2;
+  --ide-accent-yellow: #D4B56D;
+
+  --ide-scrollbar-thumb: rgba(255, 255, 255, 0.10);
+  --ide-scrollbar-track: transparent;
+
+  --ide-tab-bg: #2B2D30;
+  --ide-tab-hover: #36393E;
+  --ide-tab-border: rgba(255, 255, 255, 0.06);
+  --ide-tab-active-highlight: #3574F0;
+
+  --ide-button-primary-bg: #3574F0;
+  --ide-button-primary-hover: #4D86F4;
+  --ide-button-secondary-bg: rgba(255, 255, 255, 0.08);
+  --ide-button-secondary-hover: rgba(255, 255, 255, 0.12);
+
+  --ide-font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --ide-font-editor: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  --ide-font-size-xs: 11px;
+  --ide-font-size-sm: 12px;
+  --ide-font-size-md: 13px;
+  --ide-font-size-lg: 14px;
+  --ide-font-size-xl: 16px;
+
+  --ide-radius-xs: 3px;
+  --ide-radius-sm: 5px;
+  --ide-radius-md: 8px;
+  --ide-radius-lg: 10px;
+  --ide-radius-xl: 12px;
+
+  --ide-toolbar-height: 44px;
+  --ide-status-bar-height: 28px;
+  --ide-tool-window-width: 300px;
+  --ide-tool-window-bottom-height: 200px;
+  --ide-tab-height: 34px;
+}
+
+.light {
+  --ide-bg-main: #FFFFFF;
+  --ide-bg-panel: #F5F5F5;
+  --ide-bg-toolbar: #F0F0F0;
+  --ide-bg-statusbar: #F0F0F0;
+  --ide-bg-input: #F5F5F5;
+  --ide-bg-popup: #FFFFFF;
+  --ide-bg-card: #FFFFFF;
+
+  --ide-bg-hover: rgba(0, 0, 0, 0.04);
+  --ide-bg-active: rgba(0, 0, 0, 0.07);
+  --ide-bg-selected: rgba(53, 116, 240, 0.12);
+  --ide-bg-tooltip: #FFFFFF;
+
+  --ide-border: rgba(0, 0, 0, 0.08);
+  --ide-border-focus: #3574F0;
+  --ide-border-subtle: rgba(0, 0, 0, 0.05);
+
+  --ide-text-primary: #1C1E21;
+  --ide-text-secondary: #606468;
+  --ide-text-disabled: #9A9EA4;
+  --ide-text-accent: #000000;
+
+  --ide-accent-blue: #3574F0;
+  --ide-accent-blue-light: #589DF6;
+  --ide-accent-green: #3A8C44;
+  --ide-accent-orange: #C5782E;
+  --ide-accent-red: #CC3336;
+  --ide-accent-purple: #7A5B8C;
+  --ide-accent-cyan: #3A8AAE;
+  --ide-accent-yellow: #B7973A;
+
+  --ide-scrollbar-thumb: rgba(0, 0, 0, 0.10);
+
+  --ide-tab-bg: #F5F5F5;
+  --ide-tab-hover: #E8E8E8;
+  --ide-tab-border: rgba(0, 0, 0, 0.06);
+  --ide-tab-active-highlight: #3574F0;
+
+  --ide-button-primary-bg: #3574F0;
+  --ide-button-primary-hover: #4D86F4;
+  --ide-button-secondary-bg: rgba(0, 0, 0, 0.06);
+  --ide-button-secondary-hover: rgba(0, 0, 0, 0.10);
+}

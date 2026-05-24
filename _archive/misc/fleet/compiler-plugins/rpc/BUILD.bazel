@@ -1,0 +1,20 @@
+load("@rules_jvm//:jvm.bzl", "jvm_library", "resourcegroup")
+load("@rules_kotlin//kotlin:kotlin.bzl", "kt_compiler_plugin")
+
+jvm_library(
+  name = "rpc-compiler-plugin",
+  srcs = glob(["src/main/kotlin/**/*.kt"], exclude = ["src/main/kotlin/com/jetbrains/fleet/rpc/plugin/gradle/RpcGradlePlugin.kt"]),
+  resources = glob(["src/main/resources/**/*"]),
+  resource_strip_prefix = "src/main/resources",
+  visibility = ["//visibility:public"],
+  deps = [
+    "@rules_jvm//jvm-inc-builder:kotlin-compiler-for-bazel",
+  ],
+)
+
+kt_compiler_plugin(
+  name = "rpc-plugin",
+  id = "com.jetbrains.fleet.rpc-compiler-plugin",
+  visibility = ["//visibility:public"],
+  deps = [":rpc-compiler-plugin"],
+)

@@ -1,0 +1,272 @@
+// Copyright 2000-2025 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license.
+package org.jetbrains.kotlin.idea.jvm.k2.scratch
+
+import com.intellij.execution.JavaParametersBuilder
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.application.edtWriteAction
+import com.intellij.openapi.application.readAction
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.io.FileUtilRt
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.findDocument
+import com.intellij.platform.ide.progress.withBackgroundProgress
+import com.intellij.platform.util.progress.reportSequentialProgress
+import com.intellij.psi.PsiDocumentManager
+import com.intellij.util.PathUtil
+import com.intellij.util.io.awaitExit
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jetbrains.kotlin.idea.base.plugin.KotlinBasePluginBundle
+import org.jetbrains.kotlin.idea.base.plugin.artifacts.KotlinArtifactConstants
+import org.jetbrains.kotlin.idea.base.plugin.artifacts.KotlinArtifactConstants.OLD_KOTLIN_DIST_ARTIFACT_ID
+import org.jetbrains.kotlin.idea.base.plugin.artifacts.KotlinArtifactNames
+import org.jetbrains.kotlin.idea.base.psi.getLineNumber
+import org.jetbrains.kotlin.idea.compiler.configuration.KotlinArtifactsDownloader.downloadArtifactForIde
+import org.jetbrains.kotlin.idea.compiler.configuration.KotlinArtifactsDownloader.downloadArtifactForIdeFromSources
+import org.jetbrains.kotlin.idea.compiler.configuration.KotlinMavenUtils
+import org.jetbrains.kotlin.idea.compiler.configuration.KotlinPluginLayout
+import org.jetbrains.kotlin.idea.compiler.configuration.KotlinPluginLayoutMode
+import org.jetbrains.kotlin.idea.compiler.configuration.KotlinPluginLayoutModeProvider
+import org.jetbrains.kotlin.idea.core.script.scratch.definition.KOTLIN_SCRATCH_EXPLAIN_FILE
+import org.jetbrains.kotlin.idea.core.script.scratch.definition.KotlinScratchScript
+import org.jetbrains.kotlin.idea.jvm.shared.KotlinJvmBundle
+import org.jetbrains.kotlin.idea.jvm.shared.scratch.ScratchExecutor
+import org.jetbrains.kotlin.idea.jvm.shared.scratch.output.ExplainInfo
+import org.jetbrains.kotlin.idea.jvm.shared.scratch.output.ScratchOutput
+import org.jetbrains.kotlin.idea.jvm.shared.scratch.output.ScratchOutputType
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.readLines
+
+private val log = Logger.getInstance(K2ScratchExecutor::class.java)
+
+class K2ScratchExecutor(override val scratchFile: K2KotlinScratchFile, val project: Project, val scope: CoroutineScope) :
+    ScratchExecutor(scratchFile) {
+    override fun execute() {
+        handler.onStart(scratchFile)
+
+        scope.launch {
+            try {
+                processExecution(scratchFile.virtualFile)
+            } catch (e: Exception) {
+                handler.error(scratchFile, e.message ?: "Unknown error")
+            } finally {
+                handler.onFinish(scratchFile)
+            }
+        }
+    }
+
+    private suspend fun processExecution(scriptFile: VirtualFile) {
+        val document = readAction { scriptFile.findDocument() }
+        if (document == null) {
+            handler.error(scratchFile, "Cannot find document: ${scriptFile.path}")
+            return
+        }
+
+        edtWriteAction {
+            PsiDocumentManager.getInstance(project).commitDocument(document)
+            FileDocumentManager.getInstance().saveDocument(document)
+        }
+
+        val (code, stdout, stderr) = withBackgroundProgress(
+            project, title = KotlinJvmBundle.message("progress.title.compiling.kotlin.scratch")
+        ) {
+            val (scratchCompilerHome, distJar) = reportSequentialProgress { reporter ->
+                reporter.itemStep(KotlinBasePluginBundle.message("progress.text.kotlin.scratch.compiler.prepare")) {
+                    getKotlincIdeScratchResolution()
+                }
+            }
+
+            val scratchCompilerJar = scratchCompilerArtifact(scratchCompilerHome, KotlinArtifactNames.KOTLIN_COMPILER)
+            log.info("Using scratch compiler: home=$scratchCompilerHome, compilerJar=$scratchCompilerJar, distJar=$distJar")
+
+            val process = getJavaCommandLine(scratchFile.virtualFile, scratchFile.currentModule, scratchCompilerHome).createProcess()
+            process.awaitExit()
+            val stdout = withContext(Dispatchers.IO) {
+                process.inputStream.bufferedReader().use { it.readText() }
+            }
+            val stderr = withContext(Dispatchers.IO) {
+                process.errorStream.bufferedReader().use { it.readText() }
+            }
+
+            CompilationResult(process.exitValue(), stdout, stderr)
+        }
+
+        if (code == 0) {
+            if (stdout.isNotEmpty()) {
+                handler.handle(scratchFile, ScratchOutput(stdout, ScratchOutputType.OUTPUT))
+            }
+
+            val explanations = if (!Files.exists(scriptFile.explainFilePath)) emptyList() else {
+                scriptFile.explainFilePath.readLines().associate {
+                    it.substringBefore('=', "") to unescapeExplainValue(it.substringAfter('='))
+                }.filterKeys { it.isNotBlank() }.map { (key, value) ->
+                    val leftBracketIndex = key.indexOf("(")
+                    val rightBracketIndex = key.indexOf(")")
+                    val commaIndex = key.indexOf(",")
+
+                    val offsets =
+                        key.substring(leftBracketIndex + 1, commaIndex).trim().toInt() to key.substring(commaIndex + 1, rightBracketIndex)
+                            .trim().toInt()
+
+                    ExplainInfo(
+                        key.substring(0, leftBracketIndex), offsets, value, scratchFile.getPsiFile()?.getLineNumber(offsets.first)
+                    )
+                }
+            }
+
+            handler.handle(scratchFile, explanations, scope)
+        } else if (!scratchFile.options.isInteractiveMode) {
+            handler.error(scratchFile, "Compilation failed: $stderr")
+        }
+    }
+
+    private fun getJavaCommandLine(scriptVirtualFile: VirtualFile, module: Module?, scratchCompilerHome: Path): GeneralCommandLine {
+        val javaParameters =
+            JavaParametersBuilder(project).withSdkFrom(module).withMainClassName("org.jetbrains.kotlin.preloading.Preloader").build()
+
+        javaParameters.charset = null
+        javaParameters.vmParametersList.add("-D$KOTLIN_SCRATCH_EXPLAIN_FILE=${scriptVirtualFile.explainFilePath}")
+
+        val classPath = buildSet {
+            add(ideaScriptingJar)
+            addAll(requiredKotlinArtifacts(scratchCompilerHome))
+            if (module != null) addAll(JavaParametersBuilder.getModuleDependencies(module))
+        }
+
+        javaParameters.classPath.add(
+            scratchCompilerArtifact(
+                scratchCompilerHome, KotlinArtifactNames.KOTLIN_PRELOADER
+            ).absolutePathString()
+        )
+        @Suppress("IO_FILE_USAGE")
+        javaParameters.programParametersList.addAll(
+            "-cp",
+            scratchCompilerArtifact(scratchCompilerHome, KotlinArtifactNames.KOTLIN_COMPILER).absolutePathString(),
+            "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler",
+            "-cp",
+            classPath.joinToString(java.io.File.pathSeparator),
+            "-kotlin-home",
+            scratchCompilerHome.absolutePathString(),
+            "-script",
+            scriptVirtualFile.path,
+            "-Xplugin=${
+                scratchCompilerArtifact(
+                    scratchCompilerHome, KotlinArtifactNames.POWER_ASSERT_COMPILER_PLUGIN
+                ).absolutePathString()
+            }",
+            "-P",
+            "plugin:kotlin.scripting:script-templates=${KotlinScratchScript::class.java.name}",
+            "-Xuse-fir-lt=false",
+            "-Xallow-any-scripts-in-source-roots",
+            "-P",
+            "plugin:kotlin.scripting:disable-script-definitions-autoloading=true",
+            "-P",
+            "plugin:kotlin.scripting:disable-standard-script=true",
+            "-P",
+            "plugin:kotlin.scripting:enable-script-explanation=true",
+        )
+
+        val commandLine = javaParameters.toCommandLine()
+        log.info("commandLine=${commandLine.commandLineString}")
+
+        return commandLine
+    }
+
+    private fun requiredKotlinArtifacts(scratchCompilerHome: Path): List<String> =
+        kotlincIdeScratchClasspathArtifactFileNames.map { scratchCompilerArtifact(scratchCompilerHome, it) }
+            .filter(Files::exists).map(Path::absolutePathString)
+
+    private fun scratchCompilerArtifact(scratchCompilerHome: Path, fileName: String): Path =
+        scratchCompilerHome.resolve("lib").resolve(fileName)
+
+    private val ideaScriptingJar by lazy { PathUtil.getJarPathForClass(KotlinScratchScript::class.java) }
+
+    private val explainScratchesDirectory: Path by lazy {
+        FileUtilRt.createTempDirectory("kotlin-scratches-explain", null, true).toPath()
+    }
+
+    private val VirtualFile.explainFilePath: Path
+        get() = explainScratchesDirectory.resolve(this.name.replace(".kts", ".txt"))
+
+    override fun stop() {
+        handler.onFinish(scratchFile)
+    }
+
+    private fun unescapeExplainValue(value: String): String =
+        value.replace("\\\\", "\u0000").replace("\\n", "\n").replace("\\r", "\r").replace("\u0000", "\\")
+
+    private data class CompilationResult(
+        val code: Int,
+        val stdout: String,
+        val stderr: String,
+    )
+
+    private suspend fun getKotlincIdeScratchResolution(): ScratchCompilerResolution =
+        when (KotlinPluginLayoutModeProvider.kotlinPluginLayoutMode) {
+            KotlinPluginLayoutMode.SOURCES -> withScratchCompilerFallback("Failed to prepare scratch compiler artifacts from sources.") {
+                resolveKotlincIdeScratchHomeFromSources()
+            }
+            KotlinPluginLayoutMode.INTELLIJ -> withScratchCompilerFallback("Failed to download scratch compiler artifacts.") {
+                resolveKotlincIdeScratchHomeInProduction()
+            }
+            KotlinPluginLayoutMode.LSP -> error("LSP doesn't not include kotlinc")
+        }
+
+    private suspend fun withScratchCompilerFallback(
+        errorMessage: String,
+        block: suspend () -> ScratchCompilerResolution,
+    ): ScratchCompilerResolution = try {
+        block()
+    } catch (e: Exception) {
+        if (e is CancellationException) throw e
+        log.warn("$errorMessage Falling back to bundled JPS compiler at ${KotlinPluginLayout.kotlincPath}.", e)
+        ScratchCompilerResolution(compilerHome = KotlinPluginLayout.kotlincPath, distJar = null)
+    }
+
+    private suspend fun resolveKotlincIdeScratchHomeInProduction(): ScratchCompilerResolution {
+        val distJar = downloadArtifactForIde(
+            artifactId = OLD_KOTLIN_DIST_ARTIFACT_ID,
+            version = KotlinPluginLayout.ideCompilerVersion.rawVersion,
+            project = project,
+        ) ?: error("Can't download dist")
+
+        val unpackedDistDir = KotlinArtifactConstants.KOTLIN_DIST_LOCATION_PREFIX_PATH.resolve(kotlincIdeScratchDirectoryName)
+
+        return ScratchCompilerResolution(
+            compilerHome = withContext(Dispatchers.IO) {
+                extractKotlincIdeScratchHome(distJar = distJar, targetDir = unpackedDistDir)
+            },
+            distJar = distJar,
+        )
+    }
+
+    private suspend fun resolveKotlincIdeScratchHomeFromSources(): ScratchCompilerResolution {
+        @Suppress("DEPRECATION") val distJar = withContext(Dispatchers.IO) {
+            downloadArtifactForIdeFromSources(
+                OLD_KOTLIN_DIST_ARTIFACT_ID, KotlinMavenUtils.findLibraryVersion("kotlinc_kotlin_compiler_cli.xml")
+            )
+        } ?: error("Can't download dist")
+        val unpackedDistDir = KotlinArtifactConstants.KOTLIN_DIST_LOCATION_PREFIX_PATH.resolve(
+            "$kotlincIdeScratchDirectoryName-from-sources"
+        )
+        return ScratchCompilerResolution(
+            compilerHome = withContext(Dispatchers.IO) {
+                extractKotlincIdeScratchHome(distJar = distJar, targetDir = unpackedDistDir)
+            },
+            distJar = distJar,
+        )
+    }
+
+    private data class ScratchCompilerResolution(
+        val compilerHome: Path,
+        val distJar: Path?,
+    )
+}

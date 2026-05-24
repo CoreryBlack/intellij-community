@@ -24,3 +24,35 @@ native/**/build/
 platform/build-scripts/licenses/gradlebuild/build
 stale_outputs_checked
 /android
+
+# ============================================
+# Archived directories - not actively developed
+# These are original IntelliJ code preserved for reference
+# but excluded from IDE indexing and Git tracking
+# ============================================
+/plugins/
+/java/
+/python/
+/xml/
+/json/
+/fleet/
+/jvm/
+/uast/
+/RegExpSupport/
+/spellchecker/
+/notebooks/
+/jupyter/
+/images/
+/grid/
+/commandInterface/
+/module-set-plugins/
+/mps/
+/android-customization/
+/graalvm-debugger/
+/wintools/
+/aether-dependency-resolver/
+/docs/
+/license/
+/idea/
+/updater/
+/libraries/

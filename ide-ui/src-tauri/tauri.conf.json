@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicedoc/tauri/main/tooling/cli/schema.json",
+  "productName": "IntelliJ IDEA",
+  "version": "0.1.0",
+  "identifier": "com.intellij.ide",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "IntelliJ IDEA",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 800,
+        "minHeight": 600,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "plugins": {
+    "shell": {
+      "open": true,
+      "sidecar": true
+    }
+  }
+}
