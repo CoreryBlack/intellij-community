@@ -1,111 +1,154 @@
 :root {
-  /* === IntelliJ IDEA New UI Dark Theme === */
-  --ide-bg-main: #1E1F22;
-  --ide-bg-panel: #2B2D30;
-  --ide-bg-toolbar: #2B2D30;
-  --ide-bg-statusbar: #1E1F22;
-  --ide-bg-input: #2B2D30;
-  --ide-bg-popup: #2B2D30;
-  --ide-bg-card: #2B2D30;
+  /* === IntelliJ IDEA Islands Dark Theme (official colors from ManyIslandsDark.theme.json) === */
 
-  --ide-bg-hover: rgba(255, 255, 255, 0.06);
-  --ide-bg-active: rgba(255, 255, 255, 0.10);
-  --ide-bg-selected: rgba(89, 157, 246, 0.18);
-  --ide-bg-tooltip: #383B40;
+  /* Layer 0 - Editor / Tool Window surfaces */
+  --ide-bg-main: #191A1C;
+  --ide-bg-panel: #191A1C;
+  --ide-bg-input: #191A1C;
 
-  --ide-border: rgba(255, 255, 255, 0.08);
-  --ide-border-focus: #3574F0;
-  --ide-border-subtle: rgba(255, 255, 255, 0.05);
+  /* Layer 1 - Main Window / Toolbar / Status Bar */
+  --ide-bg-toolbar: #26282C;
+  --ide-bg-statusbar: #26282C;
+  --ide-bg-popup: #26282C;
 
-  --ide-text-primary: #CED0D6;
-  --ide-text-secondary: #8C8F94;
-  --ide-text-disabled: #545659;
+  /* Layer 2 - Cards / Elevated surfaces */
+  --ide-bg-card: #33353B;
+
+  /* Interactive states */
+  --ide-bg-hover: rgba(255,255,255,0.07);
+  --ide-bg-active: rgba(255,255,255,0.10);
+  --ide-bg-selected: #2A4371;
+  --ide-bg-selected-muted: #233558;
+  --ide-bg-tooltip: #33353B;
+  --ide-bg-focus: rgba(56,113,225,0.12);
+
+  /* Borders */
+  --ide-border: rgba(255,255,255,0.09);
+  --ide-border-focus: #3871E1;
+  --ide-border-subtle: rgba(255,255,255,0.04);
+
+  /* Text */
+  --ide-text-primary: #D1D3D9;
+  --ide-text-secondary: #9FA2A8;
+  --ide-text-disabled: #4C4F56;
   --ide-text-accent: #FFFFFF;
+  --ide-text-link: #589DF6;
 
-  --ide-accent-blue: #3574F0;
-  --ide-accent-blue-light: #589DF6;
-  --ide-accent-green: #499C54;
-  --ide-accent-orange: #DF8842;
-  --ide-accent-red: #DB4345;
-  --ide-accent-purple: #9876AA;
-  --ide-accent-cyan: #56A8D2;
-  --ide-accent-yellow: #D4B56D;
+  /* Accent colors (from official Islands palette) */
+  --ide-accent-blue: #3871E1;
+  --ide-accent-blue-light: #5B8DEF;
+  --ide-accent-green: #338555;
+  --ide-accent-orange: #B45E43;
+  --ide-accent-red: #C54E58;
+  --ide-accent-purple: #8060DB;
+  --ide-accent-cyan: #31827B;
+  --ide-accent-yellow: #A56906;
+  --ide-accent-pink: #C74B9B;
 
-  --ide-scrollbar-thumb: rgba(255, 255, 255, 0.10);
+  /* Scrollbar */
+  --ide-scrollbar-thumb: rgba(128,128,128,0.35);
   --ide-scrollbar-track: transparent;
 
-  --ide-tab-bg: #2B2D30;
-  --ide-tab-hover: #36393E;
-  --ide-tab-border: rgba(255, 255, 255, 0.06);
-  --ide-tab-active-highlight: #3574F0;
+  /* Tabs */
+  --ide-tab-bg: #191A1C;
+  --ide-tab-hover: rgba(255,255,255,0.06);
+  --ide-tab-border: rgba(255,255,255,0.04);
+  --ide-tab-active-highlight: #3871E1;
+  --ide-tab-selected-bg: #21232A;
 
-  --ide-button-primary-bg: #3574F0;
-  --ide-button-primary-hover: #4D86F4;
-  --ide-button-secondary-bg: rgba(255, 255, 255, 0.08);
-  --ide-button-secondary-hover: rgba(255, 255, 255, 0.12);
+  /* Buttons */
+  --ide-button-primary-bg: #3871E1;
+  --ide-button-primary-hover: #4A81EB;
+  --ide-button-secondary-bg: rgba(255,255,255,0.08);
+  --ide-button-secondary-hover: rgba(255,255,255,0.12);
 
-  --ide-font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --ide-font-editor: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  /* Typography */
+  --ide-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --ide-font-editor: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
   --ide-font-size-xs: 11px;
   --ide-font-size-sm: 12px;
   --ide-font-size-md: 13px;
   --ide-font-size-lg: 14px;
   --ide-font-size-xl: 16px;
 
-  --ide-radius-xs: 3px;
-  --ide-radius-sm: 5px;
+  /* Islands radii (from official Island.arc = 20, arc.compact = 16) */
+  --ide-radius-xs: 4px;
+  --ide-radius-sm: 6px;
   --ide-radius-md: 8px;
-  --ide-radius-lg: 10px;
-  --ide-radius-xl: 12px;
+  --ide-radius-lg: 12px;
+  --ide-radius-xl: 20px;
 
+  /* Layout dimensions */
   --ide-toolbar-height: 44px;
   --ide-status-bar-height: 28px;
-  --ide-tool-window-width: 300px;
-  --ide-tool-window-bottom-height: 200px;
+  --ide-tool-window-width: 280px;
   --ide-tab-height: 34px;
+  --ide-tree-row-height: 24px;
+
+  /* Shadows (Islands-style soft shadows) */
+  --ide-shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
+  --ide-shadow-md: 0 4px 12px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.2);
+  --ide-shadow-lg: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
+  --ide-shadow-popup: 0 8px 24px rgba(0,0,0,0.45), 0 0 1px rgba(255,255,255,0.05) inset;
+
+  /* Transitions */
+  --ide-transition-fast: 0.08s ease;
+  --ide-transition-normal: 0.12s ease;
+  --ide-transition-slow: 0.2s ease;
 }
 
 .light {
-  --ide-bg-main: #FFFFFF;
-  --ide-bg-panel: #F5F5F5;
-  --ide-bg-toolbar: #F0F0F0;
-  --ide-bg-statusbar: #F0F0F0;
-  --ide-bg-input: #F5F5F5;
+  /* === Islands Light Theme (official colors from ManyIslandsLight.theme.json) === */
+
+  --ide-bg-main: #E9EAEE;
+  --ide-bg-panel: #F7F8F9;
+  --ide-bg-input: #FFFFFF;
+  --ide-bg-toolbar: #E9EAEE;
+  --ide-bg-statusbar: #E8E8EB;
   --ide-bg-popup: #FFFFFF;
   --ide-bg-card: #FFFFFF;
 
-  --ide-bg-hover: rgba(0, 0, 0, 0.04);
-  --ide-bg-active: rgba(0, 0, 0, 0.07);
-  --ide-bg-selected: rgba(53, 116, 240, 0.12);
+  --ide-bg-hover: rgba(0,0,0,0.04);
+  --ide-bg-active: rgba(0,0,0,0.07);
+  --ide-bg-selected: #D0DFFE;
+  --ide-bg-selected-muted: #E3EBFE;
   --ide-bg-tooltip: #FFFFFF;
+  --ide-bg-focus: rgba(56,113,225,0.08);
 
-  --ide-border: rgba(0, 0, 0, 0.08);
-  --ide-border-focus: #3574F0;
-  --ide-border-subtle: rgba(0, 0, 0, 0.05);
+  --ide-border: rgba(0,0,0,0.09);
+  --ide-border-focus: #3871E1;
+  --ide-border-subtle: rgba(0,0,0,0.04);
 
-  --ide-text-primary: #1C1E21;
-  --ide-text-secondary: #606468;
-  --ide-text-disabled: #9A9EA4;
+  --ide-text-primary: #000000;
+  --ide-text-secondary: #5F6269;
+  --ide-text-disabled: #9FA2A8;
   --ide-text-accent: #000000;
+  --ide-text-link: #2563EB;
 
-  --ide-accent-blue: #3574F0;
-  --ide-accent-blue-light: #589DF6;
-  --ide-accent-green: #3A8C44;
-  --ide-accent-orange: #C5782E;
-  --ide-accent-red: #CC3336;
-  --ide-accent-purple: #7A5B8C;
-  --ide-accent-cyan: #3A8AAE;
-  --ide-accent-yellow: #B7973A;
+  --ide-accent-blue: #3871E1;
+  --ide-accent-blue-light: #2855B8;
+  --ide-accent-green: #338555;
+  --ide-accent-orange: #964E37;
+  --ide-accent-red: #C54E58;
+  --ide-accent-purple: #6C4EBB;
+  --ide-accent-cyan: #2A6C67;
+  --ide-accent-yellow: #875817;
+  --ide-accent-pink: #B83A88;
 
-  --ide-scrollbar-thumb: rgba(0, 0, 0, 0.10);
+  --ide-scrollbar-thumb: rgba(0,0,0,0.15);
 
-  --ide-tab-bg: #F5F5F5;
-  --ide-tab-hover: #E8E8E8;
-  --ide-tab-border: rgba(0, 0, 0, 0.06);
-  --ide-tab-active-highlight: #3574F0;
+  --ide-tab-bg: #F7F8F9;
+  --ide-tab-hover: rgba(0,0,0,0.04);
+  --ide-tab-border: rgba(0,0,0,0.08);
+  --ide-tab-selected-bg: #E3EBFE;
 
-  --ide-button-primary-bg: #3574F0;
-  --ide-button-primary-hover: #4D86F4;
-  --ide-button-secondary-bg: rgba(0, 0, 0, 0.06);
-  --ide-button-secondary-hover: rgba(0, 0, 0, 0.10);
+  --ide-button-primary-bg: #3871E1;
+  --ide-button-primary-hover: #2F5EB9;
+  --ide-button-secondary-bg: rgba(0,0,0,0.06);
+  --ide-button-secondary-hover: rgba(0,0,0,0.10);
+
+  --ide-shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
+  --ide-shadow-md: 0 4px 12px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06);
+  --ide-shadow-lg: 0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
+  --ide-shadow-popup: 0 8px 24px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.05) inset;
 }

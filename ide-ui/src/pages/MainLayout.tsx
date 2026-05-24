@@ -11,19 +11,20 @@ interface Props {
   onBackToWelcome: () => void;
 }
 
-type ToolWindow = "project" | "structure" | "commit" | "services";
+type ToolWindow = "project" | "search" | "git" | "run" | "structure";
 
 export default function MainLayout({ projectPath, theme, onToggleTheme, onBackToWelcome }: Props) {
   const [activeToolWindow, setActiveToolWindow] = useState<ToolWindow>("project");
   const [showSidebar, setShowSidebar] = useState(true);
-  const [showBottomPanel, setShowBottomPanel] = useState(false);
+  const [showBottomPanel, setShowBottomPanel] = useState(true);
   const [bottomPanelTab, setBottomPanelTab] = useState<"terminal" | "problems" | "services">("terminal");
 
-  const currentProject = projectPath.split("/").pop() || "untitled";
+  const currentProject = projectPath.split("/").pop() || "AstralLight";
 
   return (
     <div style={{
-      display:"flex",flexDirection:"column",height:"100%",background:"var(--ide-bg-main)"
+      display:"flex",flexDirection:"column",height:"100%",background:"var(--ide-bg-main)",
+      overflow:"hidden"
     }}>
       <TopToolbar
         projectName={currentProject}
@@ -32,7 +33,7 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
         onToggleTheme={onToggleTheme}
       />
 
-      <div style={{ flex:1,display:"flex",overflow:"hidden" }}>
+      <div style={{ flex:1,display:"flex",overflow:"hidden",minWidth:0 }}>
         {showSidebar && (
           <Sidebar
             activeTool={activeToolWindow}
