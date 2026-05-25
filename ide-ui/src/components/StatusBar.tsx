@@ -1,16 +1,10 @@
 interface Props {
-  projectName: string;
   theme: "dark" | "light";
   onToggleTheme: () => void;
-  showSidebar: boolean;
-  onToggleSidebar: () => void;
-  showBottomPanel: boolean;
-  onToggleBottomPanel: () => void;
 }
 
 export default function StatusBar({
-  theme, onToggleTheme, showSidebar, onToggleSidebar,
-  showBottomPanel, onToggleBottomPanel,
+  theme, onToggleTheme,
 }: Props) {
   const seg = (c: React.CSSProperties = {}): React.CSSProperties => ({
     display:"inline-flex",alignItems:"center",gap:3,padding:"0 7px",height:24,
@@ -26,18 +20,7 @@ export default function StatusBar({
       borderTop:"1px solid var(--ide-border-subtle)",padding:"0 4px",flexShrink:0,
       fontSize:"var(--ide-font-size-xs)"
     }}>
-      {/* Left section */}
-      <div style={{ display:"flex",alignItems:"center" }}>
-        <button style={{ ...seg(),padding:"0 5px" }} onClick={onToggleSidebar} title="Toggle Sidebar">
-          <span style={{ fontSize:9 }}>{showSidebar ? "◀" : "▶"}</span>
-        </button>
-        <span style={seg({ cursor:"default",color:"var(--ide-text-disabled)" })}>|</span>
-        <button style={{ ...seg(),padding:"0 5px" }} onClick={onToggleBottomPanel} title="Toggle Bottom Panel">
-          <span style={{ fontSize:9 }}>{showBottomPanel ? "▼" : "▲"}</span>
-        </button>
-      </div>
-
-      {/* Center-Left: Git info */}
+      {/* Left: Git info */}
       <div style={{ display:"flex",alignItems:"center",gap:1 }}>
         <span style={{
           ...seg({ cursor:"default" }),
@@ -63,7 +46,6 @@ export default function StatusBar({
         }}>Java</span>
         <span style={seg({ cursor:"default" })}>🔒</span>
 
-        {/* Theme toggle */}
         <button style={seg()} onClick={onToggleTheme} title="Toggle theme">
           {theme === "dark"
             ? <><svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2zm0 1.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z"/></svg> Dark</>

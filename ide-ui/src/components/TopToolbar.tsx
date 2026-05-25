@@ -5,6 +5,10 @@ interface Props {
   onBackToWelcome: () => void;
   theme: "dark" | "light";
   onToggleTheme: () => void;
+  showSidebar?: boolean;
+  onToggleSidebar?: () => void;
+  showBottomPanel?: boolean;
+  onToggleBottomPanel?: () => void;
 }
 
 interface MenuItem { label: string; shortcut?: string; icon?: string }
@@ -34,7 +38,7 @@ export const DEFAULT_TABS: OpenTab[] = [
   { name:"AstralMonitorApplication.java", path:"src/main/java/com/corvertrack/monitor/AstralMonitorApplication.java", lang:"java", modified:true },
 ];
 
-export default function TopToolbar({ projectName, onBackToWelcome, theme, onToggleTheme }: Props) {
+export default function TopToolbar({ projectName, onBackToWelcome, theme, onToggleTheme, showSidebar, onToggleSidebar, showBottomPanel, onToggleBottomPanel }: Props) {
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -95,6 +99,21 @@ export default function TopToolbar({ projectName, onBackToWelcome, theme, onTogg
         <span style={{ fontSize:"var(--ide-font-size-xs)",color:"var(--ide-text-disabled)",padding:"0 4px",fontWeight:500 }}>v1.0</span>
 
         <div style={{ width:1,height:18,background:"var(--ide-border-subtle)",margin:"0 4px" }} />
+
+        <button style={{
+          display:"inline-flex",alignItems:"center",justifyContent:"center",
+          width:24,height:24,border:"none",background:"transparent",color:"var(--ide-text-secondary)",
+          cursor:"pointer",borderRadius:"var(--ide-radius-sm)",fontSize:11,transition:"all 0.12s"
+        }} onClick={onToggleSidebar} title="Toggle Sidebar">
+          {showSidebar ? "◀" : "▶"}
+        </button>
+        <button style={{
+          display:"inline-flex",alignItems:"center",justifyContent:"center",
+          width:24,height:24,border:"none",background:"transparent",color:"var(--ide-text-secondary)",
+          cursor:"pointer",borderRadius:"var(--ide-radius-sm)",fontSize:11,transition:"all 0.12s"
+        }} onClick={onToggleBottomPanel} title="Toggle Bottom Panel">
+          {showBottomPanel ? "▼" : "▲"}
+        </button>
       </div>
 
       {/* ===== Center: File Tabs (Islands-style inline tabs) ===== */}
