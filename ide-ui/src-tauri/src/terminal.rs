@@ -8,10 +8,10 @@
  * Streams output to frontend via Tauri events
  */
 
-use portable_pty::{native_pty_system, CommandBuilder, MasterPty, PtySize};
+use portable_pty::{native_pty_system, CommandBuilder, PtySize};
 use serde::{Deserialize, Serialize};
 use std::io::{BufRead, BufReader, Write};
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, State};
 use crate::AppState;
 
@@ -169,10 +169,10 @@ pub fn terminal_write(
 
 #[tauri::command]
 pub fn terminal_resize(
-    state: State<AppState>,
-    session_id: String,
-    cols: u16,
-    rows: u16,
+    _state: State<AppState>,
+    _session_id: String,
+    _cols: u16,
+    _rows: u16,
 ) -> Result<(), String> {
     Ok(())
 }

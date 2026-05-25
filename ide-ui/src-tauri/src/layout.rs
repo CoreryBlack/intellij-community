@@ -228,6 +228,7 @@ impl LayoutDescriptor {
                 icon: "project".into(),
                 visible: true,
                 content_type: "tree".into(),
+                active: true,
             },
             ToolWindowInfo {
                 id: "search".into(),
@@ -236,6 +237,7 @@ impl LayoutDescriptor {
                 icon: "search".into(),
                 visible: true,
                 content_type: "search".into(),
+                active: false,
             },
             ToolWindowInfo {
                 id: "git".into(),
@@ -244,6 +246,7 @@ impl LayoutDescriptor {
                 icon: "git".into(),
                 visible: true,
                 content_type: "vcs".into(),
+                active: false,
             },
             ToolWindowInfo {
                 id: "run".into(),
@@ -252,6 +255,7 @@ impl LayoutDescriptor {
                 icon: "run".into(),
                 visible: true,
                 content_type: "run".into(),
+                active: false,
             },
             ToolWindowInfo {
                 id: "structure".into(),
@@ -260,6 +264,7 @@ impl LayoutDescriptor {
                 icon: "structure".into(),
                 visible: true,
                 content_type: "structure".into(),
+                active: false,
             },
         ]
     }

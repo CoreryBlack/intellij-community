@@ -148,7 +148,9 @@
   --ide-status-bar-height: 28px;
   --ide-status-bar-top-border: 0px;
   --ide-status-bar-item-height: 24px;
+  --ide-status-bar-item-padding-horizontal: 7px;
   --ide-status-bar-padding-h: 10px;
+  --ide-status-bar-font-size: 11px;
   --ide-status-bar-widget-hover-arc: 4px;
   --ide-tool-window-width: 240px;
   --ide-tool-window-header-height: 41px;

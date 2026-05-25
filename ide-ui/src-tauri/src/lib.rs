@@ -1,10 +1,11 @@
 use std::sync::Mutex;
-use tauri::State;
 
 mod commands;
 mod fs;
 mod layout;
+mod statusbar;
 mod terminal;
+mod toolbar;
 
 pub use commands::*;
 pub use fs::*;
@@ -88,6 +89,8 @@ pub struct AppState {
     pub active_tool_window: Mutex<String>,
     pub layout_descriptor: layout::LayoutDescriptor,
     pub terminal_manager: terminal::TerminalManager,
+    pub toolbar_manager: toolbar::ToolbarManager,
+    pub statusbar_manager: statusbar::StatusBarManager,
 }
 
 impl Default for AppState {
@@ -118,6 +121,8 @@ impl Default for AppState {
             active_tool_window: Mutex::new("project".into()),
             layout_descriptor: lt,
             terminal_manager: terminal::TerminalManager::new(),
+            toolbar_manager: toolbar::ToolbarManager::new(),
+            statusbar_manager: statusbar::StatusBarManager::new(),
         }
     }
 }
@@ -156,6 +161,18 @@ pub fn run() {
             terminal::get_problems,
             terminal::get_services,
             terminal::run_command,
+            toolbar::get_toolbar_descriptor,
+            toolbar::update_project_info,
+            toolbar::update_git_state,
+            toolbar::update_active_file,
+            statusbar::get_status_bar_descriptor,
+            statusbar::update_status_cursor,
+            statusbar::update_status_encoding,
+            statusbar::update_status_line_separator,
+            statusbar::update_status_language,
+            statusbar::update_status_read_only,
+            statusbar::update_status_info_message,
+            statusbar::update_status_indent_style,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
