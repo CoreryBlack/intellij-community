@@ -219,11 +219,11 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
             <button style={titleBtn}
               onMouseOver={e => e.currentTarget.style.background = "var(--ide-bg-hover)"}
               onMouseOut={e => e.currentTarget.style.background = "transparent"}
-              title="Minimize">⊟</button>
+              title="Minimize"><img src="/icons/hide.svg" width={12} height={12} alt="" style={{ display: "block" }} /></button>
             <button style={titleBtn}
               onMouseOver={e => e.currentTarget.style.background = "var(--ide-bg-hover)"}
               onMouseOut={e => e.currentTarget.style.background = "transparent"}
-              title="Settings">⚙</button>
+              title="Settings"><img src="/icons/settings.svg" width={12} height={12} alt="" style={{ display: "block" }} /></button>
           </div>
         </div>
 

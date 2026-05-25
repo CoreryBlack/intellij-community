@@ -95,6 +95,44 @@ pub struct ProgressInfo {
     pub cancellable: bool,
 }
 
+/* ──────────────────────────────────────────────
+ * MemoryIndicator — port of MemoryUsagePanel
+ * @see com.intellij.openapi.wm.impl.status.MemoryUsagePanel
+ *
+ * Shows current memory usage with a progress bar style widget.
+ * Located at the right edge of the status bar (last position).
+ * In Islands mode it uses the configured status bar colors.
+ * ────────────────────────────────────────────── */
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct MemoryInfo {
+    /// Current heap usage in MB
+    pub used_mb: u64,
+    /// Maximum heap size in MB
+    pub max_mb: u64,
+    /// Percentage used (0.0 - 1.0)
+    pub fraction: f32,
+    /// Whether memory usage is high (>80%)
+    pub is_high: bool,
+    /// Whether the memory indicator is enabled
+    pub enabled: bool,
+    /// Whether to show the memory indicator text
+    pub show_text: bool,
+}
+
+impl Default for MemoryInfo {
+    fn default() -> Self {
+        Self {
+            used_mb: 256,
+            max_mb: 1024,
+            fraction: 0.25,
+            is_high: false,
+            enabled: true,
+            show_text: false,
+        }
+    }
+}
+
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct StatusBarDescriptor {
     pub left_widgets: Vec<StatusBarWidget>,
@@ -102,6 +140,8 @@ pub struct StatusBarDescriptor {
     pub right_widgets: Vec<StatusBarWidget>,
     pub info_message: String,
     pub progress: Option<ProgressInfo>,
+    /// @see MemoryUsagePanel — memory indicator
+    pub memory: MemoryInfo,
 }
 
 pub struct StatusBarManager {
@@ -200,6 +240,16 @@ impl StatusBarManager {
                 return;
             }
         }
+    }
+
+    pub fn update_memory(&self, memory: MemoryInfo) {
+        let mut desc = self.descriptor.lock().unwrap();
+        desc.memory = memory;
+    }
+
+    pub fn toggle_memory_text(&self, show_text: bool) {
+        let mut desc = self.descriptor.lock().unwrap();
+        desc.memory.show_text = show_text;
     }
 }
 
@@ -451,8 +501,27 @@ impl Default for StatusBarDescriptor {
             right_widgets,
             info_message: "Ready".into(),
             progress: None,
+            memory: MemoryInfo::default(),
         }
     }
+}
+
+/// Tauri command to update memory info
+#[tauri::command]
+pub fn update_status_memory(
+    state: tauri::State<crate::AppState>,
+    memory: MemoryInfo,
+) {
+    state.statusbar_manager.update_memory(memory);
+}
+
+/// Tauri command to toggle memory indicator visibility
+#[tauri::command]
+pub fn toggle_memory_indicator(
+    state: tauri::State<crate::AppState>,
+    show_text: bool,
+) {
+    state.statusbar_manager.toggle_memory_text(show_text);
 }
 
 #[tauri::command]

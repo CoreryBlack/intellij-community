@@ -67,10 +67,13 @@ export default function EditorArea({ openFiles, activeFilePath, onSelectFile, on
           color: "var(--ide-text-disabled)",
           fontSize: "var(--ide-font-size-lg)",
         }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>📝</div>
-            <div>No file opened</div>
-            <div style={{ fontSize: "var(--ide-font-size-xs)", marginTop: 4 }}>Double Shift to search everywhere</div>
+          <div style={{ textAlign: "center", padding: "0 24px" }}>
+            <div style={{ fontSize: "var(--font-size-xl)", color: "var(--text-disabled)", marginBottom: 8 }}>
+              No file opened
+            </div>
+            <div style={{ fontSize: "var(--font-size-xs)", color: "var(--text-secondary)" }}>
+              Double Shift to search everywhere
+            </div>
           </div>
         </div>
       </div>

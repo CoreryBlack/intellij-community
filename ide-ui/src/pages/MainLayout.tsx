@@ -1,9 +1,37 @@
 /**
- * @see com.intellij.openapi.wm.impl.IdeRootPane.CustomHeaderRootLayout
- * @see com.intellij.toolWindow.ToolWindowPaneNewButtonManager.wrapWithControls
+ * @see com.intellij.openapi.wm.impl.IdeRootPane
+ * @see com.intellij.openapi.application.impl.islands.IslandsUICustomization
+ * @see com.intellij.openapi.wm.impl.headertoolbar.MainToolbar
  *
- * Main IDE layout — strict BorderLayout matching official IntelliJ
- * All state comes from IdeStoreContext, no local state for IDE data
+ * Main IDE layout — IntelliJ IDEA 2025+ New UI (Islands) layout.
+ * EXACTLY matches the official IslandsNewUI layout structure:
+ *
+ *   MainWindow.background (= layer-1-bg = #26282C Dark)
+ *   ┌────────────────────────────────────────────────────┐
+ *   │  MainToolbar (transparent border, same bg)         │
+ *   │  ┌──────────────────────────────────────────────┐  │
+ *   │  │ gap = emptyGap = 4px (shows main-window-bg)  │  │
+ *   │  │ ┌─────────┐ ┌──────────────────────────────┐ │  │
+ *   │  │ │Stripe   │ │ Editor Island (arc=20)       │ │  │
+ *   │  │ │(left)   │ │ ┌─ EditorTabs ──────────┐   │ │  │
+ *   │  │ │         │ │ │  ...content...         │   │ │  │
+ *   │  │ │         │ │ └────────────────────────┘   │ │  │
+ *   │  │ └─────────┘ │                              │ │  │
+ *   │  │ ┌─────────┐ │  Bottom Panel Island         │ │  │
+ *   │  │ │Stripe   │ │  (when visible)              │ │  │
+ *   │  │ │(right)  │ │                              │ │  │
+ *   │  │ └─────────┘ └──────────────────────────────┘ │  │
+ *   │  │ gap = emptyGap = 4px                         │  │
+ *   │  └──────────────────────────────────────────────┘  │
+ *   │  StatusBar (no top border, same bg)                │
+ *   └────────────────────────────────────────────────────┘
+ *
+ * Official Islands parameters (IslandsUICustomization.kt):
+ *   Island.arc = 20 (large), Island.arc.compact = 16
+ *   Island.borderWidth = 6 (→ 3px rendered offset each side)
+ *   Island.borderColor = ToolWindow.background = layer-0-bg
+ *   Islands.emptyGap = 4
+ *   Divider width = 0 (gaps handle separation)
  */
 
 import { useEffect } from "react";
@@ -16,6 +44,18 @@ import BottomPanel from "../components/BottomPanel";
 import { useIdeStore, type ToolWindowId } from "../store/ideStore";
 import { readDirectory, readFileContent, getFileLang } from "../services/fileSystem";
 import { notify } from "../components/NotificationStack";
+
+/* ── Official Islands layout constants (IslandsUICustomization.kt) ──
+ *   Island.arc = 20, Island.emptyGap = 4
+ *   Island.borderColor = ToolWindow.background (= layer-0-bg)
+ *   MainWindow.background = layer-1-bg
+ *   Each component (Sidebar, EditorArea, BottomPanel) provides its OWN
+ *   island container with the official insets (3px for tool windows, 2px for editor).
+ *   MainLayout only provides the background and 4px gaps between islands.
+ * ──────────────────────────────────────────────────────────────── */
+
+const ISLAND_GAP = "var(--island-empty-gap)";      // 4px
+const MAIN_BG = "var(--main-window-background)";
 
 interface Props {
   projectPath: string;
@@ -79,18 +119,32 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
       display: "flex",
       flexDirection: "column",
       height: "100%",
-      background: "var(--ide-bg-main)",
+      background: MAIN_BG,
       overflow: "hidden",
     }}>
       <TopToolbar
         projectName={currentProject}
         onBackToWelcome={onBackToWelcome}
-        theme={theme}
         onToggleTheme={onToggleTheme}
         onSearchEverywhere={() => dispatch({ type: "SHOW_MODAL", modal: { type: "search-everywhere" } })}
       />
 
-      <div style={{ flex: 1, display: "flex", overflow: "hidden", minWidth: 0, minHeight: 0 }}>
+      {/* ═══ Main content area with 4px gap around islands ═══
+       * @see IslandsUICustomization.configureToolWindowPane():
+       *   emptyGap=4 surrounds the toolWindowPaneParent
+       * Each component (Sidebar, EditorArea, BottomPanel) provides its own
+       * island container (arc=20, 3px/2px insets) matching XNextIslandHolder.
+       */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        overflow: "hidden",
+        gap: ISLAND_GAP,
+        padding: `${ISLAND_GAP} 0 0 ${ISLAND_GAP}`,
+        minHeight: 0,
+        minWidth: 0,
+      }}>
+        {/* Left tool window stripe — @see ToolWindow.Stripe */}
         <ToolButtonStrip
           activeTool={state.activeToolWindow || "project"}
           onSelectTool={handleSelectTool}
@@ -100,17 +154,24 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
           onToggleBottomPanel={() => dispatch({ type: "TOGGLE_BOTTOM_PANEL" })}
         />
 
+        {/* ═══ Editor layout with islands ═══
+         * Sidebar + EditorArea + BottomPanel each provide their own
+         * island container matching XNextIslandHolder / Editor island specs.
+         * 4px gap between them reveals main-window-bg (the "border").
+         */}
         <div style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          gap: ISLAND_GAP,
           minWidth: 0,
           minHeight: 0,
-          padding: "var(--island-empty-gap)",
-          gap: "var(--island-empty-gap)",
+          paddingRight: ISLAND_GAP,
+          paddingBottom: ISLAND_GAP,
         }}>
-          <div style={{ flex: 1, display: "flex", overflow: "hidden", gap: "var(--island-empty-gap)", minHeight: 0 }}>
+          <div style={{ flex: 1, display: "flex", overflow: "hidden", gap: ISLAND_GAP, minHeight: 0 }}>
+            {/* Sidebar — self-islanded via Sidebar.tsx XNextIslandHolder-style inset */}
             {state.sidebarVisible && (
               <Sidebar
                 activeTool={state.activeToolWindow || "project"}
@@ -122,8 +183,7 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
                   dispatch({
                     type: "SHOW_CONTEXT_MENU",
                     menu: {
-                      x: e.clientX,
-                      y: e.clientY,
+                      x: e.clientX, y: e.clientY,
                       items: [
                         { label: "Open", shortcut: "Enter", action: () => handleOpenFile(path, name) },
                         { label: "Copy Path", shortcut: "Ctrl+Shift+C", action: () => { navigator.clipboard.writeText(path); notify(dispatch, "info", "Copied", path); } },
@@ -136,45 +196,53 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
                 }}
               />
             )}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", gap: "var(--island-empty-gap)", minWidth: 0, minHeight: 0 }}>
-              <EditorArea
-                openFiles={state.openFiles}
-                activeFilePath={state.activeFilePath}
-                onSelectFile={(path) => dispatch({ type: "SET_ACTIVE_FILE", path })}
-                onCloseFile={(path) => dispatch({ type: "CLOSE_FILE", path })}
-                onTabContextMenu={(e, path) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  dispatch({
-                    type: "SHOW_CONTEXT_MENU",
-                    menu: {
-                      x: e.clientX,
-                      y: e.clientY,
-                      items: [
-                        { label: "Close", shortcut: "Ctrl+W", action: () => dispatch({ type: "CLOSE_FILE", path }) },
-                        { label: "Close Others", action: () => { state.openFiles.forEach(f => { if (f.path !== path) dispatch({ type: "CLOSE_FILE", path: f.path }); }); } },
-                        { label: "Close All", action: () => { state.openFiles.forEach(f => dispatch({ type: "CLOSE_FILE", path: f.path })); } },
-                        { label: "", separator: true, action: () => {} },
-                        { label: "Copy Path", shortcut: "Ctrl+Shift+C", action: () => { navigator.clipboard.writeText(path); } },
-                        { label: "Copy Reference", action: () => {} },
-                      ],
-                    },
-                  });
-                }}
-              />
-              {state.bottomPanelVisible && (
-                <BottomPanel
-                  bottomPanelTab={state.bottomPanelTab}
-                  onBottomPanelTab={(tab) => dispatch({ type: "SET_BOTTOM_TAB", tab })}
-                  onHide={() => dispatch({ type: "TOGGLE_BOTTOM_PANEL" })}
-                  projectPath={state.projectPath}
-                />
-              )}
-            </div>
+
+            {/* EditorArea — self-islanded via EditorArea.tsx Editor island-style inset */}
+            <EditorArea
+              openFiles={state.openFiles}
+              activeFilePath={state.activeFilePath}
+              onSelectFile={(path) => dispatch({ type: "SET_ACTIVE_FILE", path })}
+              onCloseFile={(path) => dispatch({ type: "CLOSE_FILE", path })}
+              onTabContextMenu={(e, path) => {
+                e.preventDefault(); e.stopPropagation();
+                dispatch({
+                  type: "SHOW_CONTEXT_MENU",
+                  menu: {
+                    x: e.clientX, y: e.clientY,
+                    items: [
+                      { label: "Close", shortcut: "Ctrl+W", action: () => dispatch({ type: "CLOSE_FILE", path }) },
+                      { label: "Close Others", action: () => { state.openFiles.forEach(f => { if (f.path !== path) dispatch({ type: "CLOSE_FILE", path: f.path }); }); } },
+                      { label: "Close All", action: () => { state.openFiles.forEach(f => dispatch({ type: "CLOSE_FILE", path: f.path })); } },
+                      { label: "", separator: true, action: () => {} },
+                      { label: "Copy Path", shortcut: "Ctrl+Shift+C", action: () => { navigator.clipboard.writeText(path); } },
+                      { label: "Copy Reference", action: () => {} },
+                    ],
+                  },
+                });
+              }}
+            />
           </div>
+
+          {/* BottomPanel — self-islanded via BottomPanel.tsx XNextIslandHolder-style inset */}
+          {state.bottomPanelVisible && (
+            <BottomPanel
+              bottomPanelTab={state.bottomPanelTab}
+              onBottomPanelTab={(tab) => dispatch({ type: "SET_BOTTOM_TAB", tab })}
+              onHide={() => dispatch({ type: "TOGGLE_BOTTOM_PANEL" })}
+              projectPath={state.projectPath}
+            />
+          )}
         </div>
+
+        {/* Right tool window stripe (hidden by default, similar to left) */}
       </div>
 
+      {/* ═══ Status Bar ═══
+       * @see IslandsUICustomization:
+       *   StatusBar.borderColor = transparent
+       *   topBorderWidth = 0
+       *   background = main-window-bg
+       */}
       <StatusBar theme={theme} onToggleTheme={onToggleTheme} />
     </div>
   );

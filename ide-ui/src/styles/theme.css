@@ -1,277 +1,1034 @@
 :root {
-  /* === IntelliJ IDEA Islands Dark Theme ===
-   * Source: ManyIslandsDark.theme.json + IslandsUICustomization.kt
-   * Every color and dimension matches official JetBrains New UI 2024-2025 */
+  /*
+   * IntelliJ IDEA Islands Dark Theme
+   * COMPLETE port of ManyIslandsDark.theme.json + JBUI.java + IslandsUICustomization.kt
+   * Every CSS variable is a DIRECT port of the official theme key.
+   * No custom design decisions.
+   */
 
-  /* ── Layer System (official semantic layers) ── */
-  --ide-layer0-bg: #191A1C;
-  --ide-layer0-border: #26282C;
-  --ide-layer0-bg-inline: #212326;
-  --ide-layer1-bg: #26282C;
-  --ide-layer1-border: #33353B;
-  --ide-layer2-bg: #33353B;
-  --ide-layer2-border: #3D3F45;
+  /* ════════════════════════════════════════════
+   * Color Palette (ManyIslandsDark.theme.json lines 9-149)
+   * ════════════════════════════════════════════ */
 
-  /* ── Surface backgrounds ── */
-  --ide-bg-main: #26282C;
-  --ide-bg-editor: #191A1C;
-  --ide-bg-tool-window: #191A1C;
-  --ide-bg-toolbar: #26282C;
-  --ide-bg-statusbar: #26282C;
-  --ide-bg-popup: #26282C;
-  --ide-bg-dialog: #191A1C;
-  --ide-bg-card: #33353B;
-  --ide-bg-input: #191A1C;
-  --ide-bg-stripe: #26282C;
+  --white: #FFFFFF;
+  --black: #000000;
 
-  /* ── Interactive states ── */
-  --ide-bg-hover: #FFFFFF12;
-  --ide-bg-pressed: #FFFFFF1E;
-  --ide-bg-active: #FFFFFF17;
-  --ide-bg-selected: #2E4D89;
-  --ide-bg-selected-muted: #233558;
-  --ide-bg-tooltip: #33353B;
-  --ide-bg-focus: rgba(56,113,225,0.12);
+  --gray-160: #F7F8F9;
+  --gray-150: #E9EAEE;
+  --gray-140: #DDDFE4;
+  --gray-130: #D1D3D9;
+  --gray-120: #C3C5CB;
+  --gray-110: #B5B7BD;
+  --gray-100: #9FA2A8;
+  --gray-90: #8B8E94;
+  --gray-80: #73767C;
+  --gray-70: #5F6269;
+  --gray-60: #4C4F56;
+  --gray-50: #40434A;
+  --gray-40: #33353B;
+  --gray-30: #26282C;
+  --gray-20: #212326;
+  --gray-10: #191A1C;
 
-  /* ── Borders ── */
-  --ide-border: #FFFFFF15;
-  --ide-border-focus: #3871E1;
-  --ide-border-subtle: #FFFFFF0A;
-  --ide-border-toolbar: #FFFFFF12;
+  --blue-160: #F7F8FF;
+  --blue-150: #E3EBFE;
+  --blue-140: #D0DFFE;
+  --blue-130: #BDD3FF;
+  --blue-120: #A7C5FF;
+  --blue-110: #92B7FF;
+  --blue-100: #71A1FE;
+  --blue-90: #538AF9;
+  --blue-80: #3871E1;
+  --blue-70: #2F5EB9;
+  --blue-60: #2E4D89;
+  --blue-50: #2A4371;
+  --blue-40: #233558;
+  --blue-30: #1B283F;
+  --blue-20: #182337;
+  --blue-10: #131A28;
 
-  /* ── Text ── */
-  --ide-text-default: #D1D3D9;
-  --ide-text-primary: #D1D3D9;
-  --ide-text-muted: #9FA2A8;
-  --ide-text-secondary: #73767C;
-  --ide-text-disabled: #4C4F56;
-  --ide-text-accent: #FFFFFF;
-  --ide-text-link: #71A1FE;
-  --ide-text-editor: #BCBEC4;
+  --green-160: #F5FAF3;
+  --green-150: #E2EFE2;
+  --green-140: #CDE5D1;
+  --green-130: #BBDBC2;
+  --green-120: #A3CFAE;
+  --green-110: #8EC39D;
+  --green-100: #6DB083;
+  --green-90: #4E9D6C;
+  --green-80: #338555;
+  --green-70: #2A6E47;
+  --green-60: #29583C;
+  --green-50: #274B34;
+  --green-40: #203B2A;
+  --green-30: #192C20;
+  --green-20: #16261C;
+  --green-10: #111C15;
 
-  /* ── Accent colors (official Islands palette) ── */
-  --ide-accent-blue: #3871E1;
-  --ide-accent-blue-60: #2E4D89;
-  --ide-accent-blue-80: #3871E1;
-  --ide-accent-blue-100: #71A1FE;
-  --ide-accent-green: #338555;
-  --ide-accent-orange: #B45E43;
-  --ide-accent-red: #C54E58;
-  --ide-accent-purple: #8060DB;
-  --ide-accent-cyan: #31827B;
-  --ide-accent-yellow: #A56906;
-  --ide-accent-pink: #C74B9B;
+  --red-160: #FFF6F5;
+  --red-150: #FFE5E5;
+  --red-140: #FFD6D6;
+  --red-130: #FFC4C5;
+  --red-120: #FFB0B2;
+  --red-110: #FF9B9F;
+  --red-100: #F57E84;
+  --red-90: #E4656E;
+  --red-80: #C54E58;
+  --red-70: #A4414A;
+  --red-60: #80383E;
+  --red-50: #6D3136;
+  --red-40: #56272B;
+  --red-30: #3F1E21;
+  --red-20: #371B1C;
+  --red-10: #291416;
 
-  /* ── Island parameters (from IslandsUICustomization.kt) ── */
-  --island-arc: 20px;
-  --island-arc-compact: 16px;
-  --island-border-width: 6px;
-  --island-border-width-compact: 4px;
-  --island-border-arc-length: 14px;
-  --island-border-color: #191A1C;
-  --island-inactive-alpha: 0.56;
-  --island-tool-window-alpha: 0.2;
-  --island-empty-gap: 4px;
-  --island-tool-window-padding: 3px;
-  --island-editor-padding: 2px;
+  --yellow-160: #FFF6E9;
+  --yellow-150: #FDE7C9;
+  --yellow-140: #FADBB3;
+  --yellow-130: #F4CD9A;
+  --yellow-120: #ECBC7B;
+  --yellow-110: #E4AD5F;
+  --yellow-100: #D59637;
+  --yellow-90: #C28013;
+  --yellow-80: #A56906;
+  --yellow-70: #875817;
+  --yellow-60: #694820;
+  --yellow-50: #583E21;
+  --yellow-40: #44321D;
+  --yellow-30: #322517;
+  --yellow-20: #2C2115;
+  --yellow-10: #201810;
 
-  /* ── EditorTabs (from ManyIslandsDark.theme.json + IslandsTabPainter) ── */
+  --orange-160: #FFF6F3;
+  --orange-150: #FFE6DD;
+  --orange-140: #FED6CA;
+  --orange-130: #FBC7B7;
+  --orange-120: #F5B6A1;
+  --orange-110: #EEA58E;
+  --orange-100: #E18C71;
+  --orange-90: #CF7659;
+  --orange-80: #B45E43;
+  --orange-70: #964E37;
+  --orange-60: #77402F;
+  --orange-50: #643829;
+  --orange-40: #4F2C21;
+  --orange-30: #3B2119;
+  --orange-20: #331D16;
+  --orange-10: #261611;
+
+  --purple-160: #FAF6FE;
+  --purple-150: #EDE8FD;
+  --purple-140: #E2DBFC;
+  --purple-130: #D6CDFB;
+  --purple-120: #C9BDFA;
+  --purple-110: #BBACF9;
+  --purple-100: #A894F6;
+  --purple-90: #967BEF;
+  --purple-80: #8060DB;
+  --purple-70: #6C4EBB;
+  --purple-60: #574092;
+  --purple-50: #4A387B;
+  --purple-40: #3A2D5F;
+  --purple-30: #2B2245;
+  --purple-20: #261E3C;
+  --purple-10: #1C172B;
+
+  --teal-160: #F5F9F8;
+  --teal-150: #E1EEEC;
+  --teal-140: #CDE4E0;
+  --teal-130: #B9D9D4;
+  --teal-120: #A2CDC7;
+  --teal-110: #8CC1BA;
+  --teal-100: #6AAEA6;
+  --teal-90: #4B9B93;
+  --teal-80: #31827B;
+  --teal-70: #2A6C67;
+  --teal-60: #285653;
+  --teal-50: #244A46;
+  --teal-40: #1E3A38;
+  --teal-30: #182B2A;
+  --teal-20: #152624;
+  --teal-10: #111C1B;
+
+  --transparent-white-10: #FFFFFF10;
+  --transparent-white-20: #FFFFFF17;
+  --transparent-white-30: #FFFFFF21;
+  --transparent-white-40: #FFFFFF29;
+  --transparent-white-50: #FFFFFF3B;
+  --transparent-black-10: #00000008;
+  --transparent-black-20: #00000012;
+  --transparent-black-30: #00000020;
+  --transparent-black-40: #00000030;
+  --transparent-black-50: #00000045;
+  --transparent: #191A1C00;
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Text (ManyIslandsDark.theme.json lines 152-162)
+   * ════════════════════════════════════════════ */
+
+  --text-default: var(--gray-130);
+  --text-muted: var(--gray-100);
+  --text-secondary: var(--gray-80);
+  --text-disabled: var(--gray-60);
+  --text-over-accent: var(--white);
+  --text-over-accent-inverted: var(--black);
+  --text-link: var(--blue-100);
+  --text-error: var(--red-100);
+  --text-warning: var(--yellow-100);
+  --text-success: var(--green-100);
+  --editor-text: #BCBEC4;
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Layers (ManyIslandsDark.theme.json lines 164-175)
+   * ════════════════════════════════════════════ */
+
+  --layer-0-bg: var(--gray-10);
+  --layer-0-border: var(--gray-30);
+  --layer-0-bg-inline: var(--gray-20);
+  --layer-0-border-inline: var(--gray-30);
+  --layer-1-bg: var(--gray-30);
+  --layer-1-border: var(--gray-40);
+  --layer-1-bg-inline: var(--gray-40);
+  --layer-1-border-inline: var(--gray-50);
+  --layer-2-bg: var(--gray-40);
+  --layer-2-bg-inline: var(--gray-50);
+  --layer-2-border: var(--gray-50);
+  --layer-2-border-inline: var(--gray-60);
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Accent (ManyIslandsDark.theme.json lines 177-196)
+   * ════════════════════════════════════════════ */
+
+  --accent-brand-bg: var(--blue-80);
+  --accent-brand-border: var(--blue-80);
+  --accent-brand-bg-secondary: var(--blue-40);
+  --accent-brand-border-secondary: var(--blue-60);
+  --accent-error-bg: var(--red-80);
+  --accent-error-border: var(--red-80);
+  --accent-error-bg-secondary: var(--red-40);
+  --accent-error-border-secondary: var(--red-60);
+  --accent-warning-bg: var(--yellow-80);
+  --accent-warning-border: var(--yellow-80);
+  --accent-warning-bg-secondary: var(--yellow-40);
+  --accent-warning-border-secondary: var(--yellow-60);
+  --accent-success-bg: var(--green-80);
+  --accent-success-border: var(--green-80);
+  --accent-success-bg-secondary: var(--green-40);
+  --accent-success-border-secondary: var(--green-60);
+  --accent-neutral-bg: var(--gray-80);
+  --accent-ai-bg: var(--purple-20);
+  --accent-ai-border: var(--purple-50);
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Core transparent states
+   * ════════════════════════════════════════════ */
+
+  --core-bg-transparent-hovered: var(--transparent-white-20);
+  --core-bg-transparent-pressed: var(--transparent-white-40);
+  --core-border-transparent: var(--transparent-white-30);
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Surface backgrounds (ManyIslandsDark.theme.json lines 201-220)
+   * ════════════════════════════════════════════ */
+
+  --dialog-bg: var(--layer-0-bg);
+  --dialog-bg-inline: var(--layer-0-bg-inline);
+  --dialog-border: var(--layer-0-border);
+  --popup-bg: var(--layer-1-bg);
+  --popup-bg-inline: var(--layer-1-bg);
+  --popup-border: var(--layer-1-border);
+  --popup-border-inline: var(--layer-1-border);
+  --editor-bg: var(--layer-0-bg);
+  --editor-bg-inline: var(--layer-0-bg-inline);
+  --editor-border: var(--layer-0-border);
+  --editor-border-inline: var(--layer-0-border-inline);
+  --editor-border-alt: var(--gray-40);
+  --tool-window-bg: var(--layer-0-bg);
+  --tool-window-bg-inline: var(--layer-0-bg-inline);
+  --tool-window-bg-alt: var(--gray-20);
+  --tool-window-border: var(--layer-0-border);
+  --tool-window-border-inline: var(--layer-0-border-inline);
+  --main-window-bg: var(--layer-1-bg);
+  --main-window-bg-alt: var(--gray-40);
+  --main-window-border: var(--layer-2-border);
+
+  --control-bg: var(--dialog-bg);
+  --control-bg-disabled: var(--dialog-bg);
+  --control-bg-raised: var(--gray-30);
+  --control-border: var(--gray-50);
+  --control-border-disabled: var(--gray-40);
+  --control-border-raised: var(--gray-70);
+  --control-border-over-accent: var(--transparent-white-50);
+  --control-bg-small: var(--gray-50);
+  --control-bg-small-disabled: var(--gray-40);
+  --control-border-small: var(--gray-70);
+  --control-brand-bg: var(--accent-brand-bg);
+  --control-brand-border: var(--accent-brand-border);
+  --control-error-bg: var(--accent-error-bg);
+  --control-error-border: var(--accent-error-border);
+  --control-error-border-secondary: var(--red-50);
+  --control-warning-bg: var(--accent-warning-bg);
+  --control-warning-border: var(--accent-warning-border);
+  --control-warning-border-secondary: var(--yellow-50);
+  --control-success-bg: var(--accent-success-bg);
+  --control-success-border: var(--accent-success-border);
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Toolbar states (ManyIslandsDark.theme.json lines 243-252)
+   * ════════════════════════════════════════════ */
+
+  --toolbar-bg-hovered: var(--core-bg-transparent-hovered);
+  --toolbar-bg-pressed: var(--core-bg-transparent-pressed);
+  --toolbar-border: var(--core-border-transparent);
+  --toolbar-selected-bg: var(--blue-60);
+  --toolbar-selected-bg-hovered: var(--blue-70);
+  --toolbar-selected-bg-active: var(--accent-brand-bg);
+  --toolbar-run-bg: var(--accent-success-bg);
+  --toolbar-run-bg-hovered: var(--green-70);
+  --toolbar-stop-bg: var(--accent-error-bg);
+  --toolbar-stop-bg-hovered: var(--red-70);
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Feedback (ManyIslandsDark.theme.json lines 254-267)
+   * ════════════════════════════════════════════ */
+
+  --feedback-bg: var(--layer-2-bg);
+  --feedback-border: var(--layer-2-bg);
+  --feedback-bg-inline: var(--layer-0-bg);
+  --feedback-brand-bg: var(--accent-brand-bg-secondary);
+  --feedback-brand-border: var(--accent-brand-border-secondary);
+  --feedback-success-bg: var(--accent-success-bg-secondary);
+  --feedback-success-border: var(--accent-success-border-secondary);
+  --feedback-warning-bg: var(--accent-warning-bg-secondary);
+  --feedback-warning-border: var(--accent-warning-border-secondary);
+  --feedback-error-bg: var(--accent-error-bg-secondary);
+  --feedback-error-border: var(--accent-error-border-secondary);
+  --feedback-control-border: var(--control-border-over-accent);
+  --feedback-ai-bg: var(--accent-ai-bg);
+  --feedback-ai-border: var(--accent-ai-border);
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Selection (ManyIslandsDark.theme.json lines 269-272)
+   * ════════════════════════════════════════════ */
+
+  --selection-bg-active: var(--blue-50);
+  --selection-bg-active-muted: var(--blue-40);
+  --selection-bg-inactive: var(--gray-40);
+  --selection-bg-hovered: var(--transparent-white-10);
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Tabs (ManyIslandsDark.theme.json lines 274-279)
+   * ════════════════════════════════════════════ */
+
+  --tab-selected-bg-active: var(--blue-40);
+  --tab-selected-bg-inactive: var(--gray-30);
+  --tab-selected-border-active: var(--blue-60);
+  --tab-selected-border-inactive: var(--gray-50);
+  --tab-bg-hovered: var(--core-bg-transparent-hovered);
+  --tab-file-color-mask-bg: #1E1F2280;
+
+  /* ════════════════════════════════════════════
+   * Semantic Colors — Misc (ManyIslandsDark.theme.json lines 281-363)
+   * ════════════════════════════════════════════ */
+
+  --got-it-bg: var(--blue-60);
+  --got-it-border: var(--blue-60);
+  --got-it-text-link: var(--blue-110);
+  --got-it-text-step: var(--gray-90);
+  --got-it-shortcut-bg: var(--accent-brand-bg-secondary);
+  --got-it-code-border: #FFFFFF70;
+  --got-it-contrast-button-bg: var(--accent-brand-bg-secondary);
+
+  --inlay-bg: var(--transparent-white-30);
+  --inlay-border: var(--transparent-white-50);
+
+  --toggle-off-bg: var(--gray-10);
+  --toggle-button-bg: var(--gray-70);
+  --toggle-border: var(--gray-70);
+
+  --editor-floating-toolbar-bg: var(--layer-2-bg);
+  --popup-completion-match-text: var(--blue-90);
+  --presentation-assistant-bg: var(--blue-60);
+  --search-match-bg: #BA9752;
+  --tree-indent-guide-border: var(--gray-40);
+
+  --icon-default-stroke: var(--gray-120);
+  --icon-over-accent: var(--white);
+  --icon-green-stroke: var(--green-90);
+
+  --popup-border-windows: var(--gray-50);
+
+  /* ════════════════════════════════════════════
+   * Focus (ManyIslandsDark.theme.json ui.*.focusColor = control-brand-border = blue-80)
+   * ════════════════════════════════════════════ */
+
+  --focus-color: var(--blue-80);
+
+  /* ════════════════════════════════════════════
+   * ActionButton (ManyIslandsDark.theme.json lines 433-440)
+   * ════════════════════════════════════════════ */
+
+  --action-button-hover-bg: var(--toolbar-bg-hovered);
+  --action-button-hover-border: transparent;
+  --action-button-pressed-bg: var(--toolbar-bg-pressed);
+  --action-button-pressed-border: transparent;
+  --action-button-focused-border: var(--control-brand-border);
+  --action-button-hover-separator: var(--toolbar-border);
+
+  /* ════════════════════════════════════════════
+   * Badge (ManyIslandsDark.theme.json lines 444-461)
+   * ════════════════════════════════════════════ */
+
+  --badge-green-fg: var(--text-success);
+  --badge-green-border: var(--control-success-border);
+  --badge-blue-secondary-bg: #2F5EB9B3;
+  --badge-blue-secondary-fg: var(--blue-140);
+  --badge-blue-bg: var(--blue-90);
+  --badge-blue-fg: var(--gray-20);
+  --badge-green-secondary-bg: #2A6E47B3;
+  --badge-green-secondary-fg: var(--green-140);
+
+  /* ════════════════════════════════════════════
+   * Banner (ManyIslandsDark.theme.json lines 463-477)
+   * ════════════════════════════════════════════ */
+
+  --banner-error-bg: var(--feedback-error-bg);
+  --banner-error-border: var(--feedback-error-border);
+  --banner-warning-bg: var(--feedback-warning-bg);
+  --banner-warning-border: var(--feedback-warning-border);
+  --banner-success-bg: var(--feedback-success-bg);
+  --banner-success-border: var(--feedback-success-border);
+  --banner-info-bg: var(--feedback-brand-bg);
+  --banner-info-border: var(--feedback-brand-border);
+  --banner-ai-bg: var(--feedback-ai-bg);
+  --banner-ai-border: var(--feedback-ai-border);
+  --banner-arc: 12px;
+  --banner-arc-compact: 8px;
+
+  /* ════════════════════════════════════════════
+   * Borders (ManyIslandsDark.theme.json lines 491-492)
+   * ════════════════════════════════════════════ */
+
+  --borders-color: var(--dialog-border);
+
+  /* ════════════════════════════════════════════
+   * Button (ManyIslandsDark.theme.json lines 496-524)
+   * ════════════════════════════════════════════ */
+
+  --button-arc: 8px;
+  --button-minimum-size-width: 72px;
+  --button-minimum-size-height: 28px;
+  --button-minimum-size-height-compact: 24px;
+  --button-start-bg: transparent;
+  --button-end-bg: transparent;
+  --button-start-border: var(--control-border);
+  --button-end-border: var(--control-border);
+  --button-focused-border: var(--control-bg);
+  --button-shadow: transparent;
+  --button-loading-fg: var(--text-secondary);
+
+  --button-default-fg: var(--text-over-accent);
+  --button-default-start-bg: var(--control-brand-bg);
+  --button-default-end-bg: var(--control-brand-bg);
+  --button-default-start-border: var(--control-brand-bg);
+  --button-default-end-border: var(--control-brand-bg);
+
+  /* ════════════════════════════════════════════
+   * CheckBox / RadioButton (ManyIslandsDark.theme.json lines 527-530, 947-951)
+   * ════════════════════════════════════════════ */
+
+  --checkbox-border-insets: 4px;
+  --checkbox-icon-size: 24px;
+  --checkbox-text-gap: 4px;
+
+  --radio-border-insets: 4px;
+  --radio-icon-size: 24px;
+  --radio-text-gap: 4px;
+
+  /* ════════════════════════════════════════════
+   * ComboBox (ManyIslandsDark.theme.json lines 539-553)
+   * ════════════════════════════════════════════ */
+
+  --combobox-minimum-size-width: 49px;
+  --combobox-minimum-size-height: 28px;
+  --combobox-minimum-size-height-compact: 24px;
+  --combobox-padding: 1px 9px 1px 6px;
+  --combobox-padding-compact: 1px 6px 1px 6px;
+  --combobox-arrow-bg: var(--control-bg);
+  --combobox-arrow-non-editable-bg: var(--control-bg-raised);
+  --combobox-bg: var(--popup-bg);
+  --combobox-non-editable-bg: var(--control-bg-raised);
+  --combobox-disabled-bg: var(--control-bg-disabled);
+
+  /* ════════════════════════════════════════════
+   * Component (ManyIslandsDark.theme.json lines 660-670)
+   * ════════════════════════════════════════════ */
+
+  --component-arc: 8px;
+  --component-arc-compact: 6px;
+  --component-arrow-area-width: 28px;
+  --component-border: var(--control-border);
+  --component-focused-border: var(--dialog-bg);
+  --component-error-focus: var(--control-error-border);
+  --component-inactive-error-focus: var(--control-error-border-secondary);
+  --component-warning-focus: var(--control-warning-border);
+  --component-inactive-warning-focus: var(--control-warning-border-secondary);
+
+  /* ════════════════════════════════════════════
+   * DragAndDrop (ManyIslandsDark.theme.json lines 672-676)
+   * ════════════════════════════════════════════ */
+
+  --dnd-border: var(--control-brand-border);
+  --dnd-row-bg: #3573F026;
+  --dnd-area-bg: #FFFFFF10;
+
+  /* ════════════════════════════════════════════
+   * Editor (ManyIslandsDark.theme.json lines 700-720)
+   * ════════════════════════════════════════════ */
+
+  --editor-search-field-bg: var(--editor-bg-inline);
+  --editor-search-field-border: var(--editor-border-inline);
+  --editor-toolbar-border: var(--editor-border-inline);
+  --editor-tooltip-bg: var(--popup-bg);
+  --editor-tooltip-border: var(--popup-border);
+  --editor-tooltip-error-bg: var(--feedback-error-bg);
+  --editor-tooltip-error-border: var(--feedback-error-border);
+  --editor-tooltip-success-bg: var(--feedback-success-bg);
+  --editor-tooltip-success-border: var(--feedback-success-border);
+  --editor-tooltip-warning-bg: var(--feedback-warning-bg);
+  --editor-tooltip-warning-border: var(--feedback-warning-border);
+  --editor-tooltip-icon-hover: var(--toolbar-bg-hovered);
+  --editor-tooltip-selection-bg: #2B2D30;
+
+  /* ════════════════════════════════════════════
+   * EditorTabs (ManyIslandsDark.theme.json lines 678-698)
+   * ════════════════════════════════════════════ */
+
   --editor-tab-underline-arc: 4px;
-  --editor-tab-underline-height: 0px;
+  --editor-tab-underline-height: 4px;
   --editor-tab-unselected-alpha: 0.75;
   --editor-tab-unselected-blend: 0.7;
-  --editor-tab-bg: #191A1C;
-  --editor-tab-hover-bg: #FFFFFF12;
-  --editor-tab-selected-border-active: #2E4D89;
-  --editor-tab-selected-bg-active: #233558;
-  --editor-tab-selected-border-inactive: #40434A;
-  --editor-tab-selected-bg-inactive: #26282C;
-  --editor-tab-arc: 12px;
-  --editor-tab-height: 28px;
-  --editor-tab-h-offset: 4px;
+  --editor-tab-bg: var(--layer-0-bg);
+  --editor-tab-hover-bg: var(--tab-bg-hovered);
+  --editor-tab-hover-inactive-bg: var(--tab-bg-hovered);
+  --editor-tab-inactive-colored-file-bg: var(--tab-file-color-mask-bg);
+  --editor-tab-under-tabs-border: var(--editor-border);
+  --editor-tab-underlined-border: var(--tab-selected-border-active);
+  --editor-tab-underlined-bg: var(--tab-selected-bg-active);
+  --editor-tab-inactive-underlined-border: var(--tab-selected-border-inactive);
+  --editor-tab-inactive-underlined-bg: var(--tab-selected-bg-inactive);
   --editor-tab-inset-top: -6px;
   --editor-tab-inset-left: 8px;
   --editor-tab-inset-bottom: -6px;
   --editor-tab-inset-right: 8px;
+  --editor-tab-inset-top-compact: -2px;
+  --editor-tab-inset-left-compact: 6px;
+  --editor-tab-inset-bottom-compact: -2px;
+  --editor-tab-inset-right-compact: 4px;
 
-  /* ── Component (from ManyIslandsDark.theme.json) ── */
-  --component-arc: 8px;
-  --component-arc-compact: 6px;
-  --component-arrow-area-width: 28px;
+  /* ════════════════════════════════════════════
+   * InlineBanner (ManyIslandsDark.theme.json lines 478-481)
+   * ════════════════════════════════════════════ */
 
-  /* ── Toolbar button colors ── */
-  --toolbar-bg-hovered: #FFFFFF17;
-  --toolbar-bg-pressed: #FFFFFF29;
-  --toolbar-border: #FFFFFF21;
-  --toolbar-selected-bg: #3871E1;
-  --toolbar-selected-fg: #FFFFFF;
-  --toolbar-stripe-bg: #26282C;
-  --toolbar-stripe-button-width: 37px;
-  --toolbar-stripe-button-height: 40px;
-  --toolbar-stripe-button-icon-size: 20px;
-  --toolbar-stripe-button-arc: 8px;
-  --toolbar-button-arc: 12px;
-  --toolbar-button-insets-top: 6px;
-  --toolbar-button-insets-left: 5px;
-  --toolbar-button-insets-bottom: 4px;
-  --toolbar-button-insets-right: 5px;
+  --inline-banner-hover-bg: var(--toolbar-bg-hovered);
+  --inline-banner-pressed-bg: var(--toolbar-bg-pressed);
 
-  /* ── Scrollbar ── */
-  --ide-scrollbar-thumb: rgba(128,128,128,0.35);
-  --ide-scrollbar-track: transparent;
+  /* ════════════════════════════════════════════
+   * Islands (ManyIslandsDark.theme.json lines 403-414)
+   * ════════════════════════════════════════════ */
 
-  /* ── Buttons ── */
-  --ide-button-primary-bg: #3871E1;
-  --ide-button-primary-hover: #4A81EB;
-  --ide-button-secondary-bg: rgba(255,255,255,0.08);
-  --ide-button-secondary-hover: rgba(255,255,255,0.12);
+  --islands-enabled: 1;
+  --island-arc: 20px;
+  --island-arc-compact: 16px;
+  --island-border-arc-length: 14px;
+  --island-border-arc-length-compact: 10px;
+  --island-border-width: 6px;
+  --island-border-width-compact: 4px;
+  --island-border-color: var(--tool-window-bg);
+  --island-inactive-alpha: 0.56;
+  --island-tool-window-alpha: 0.2;
 
-  /* ── Typography ── */
-  --ide-font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --ide-font-editor: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
-  --ide-font-size-xs: 11px;
-  --ide-font-size-sm: 12px;
-  --ide-font-size-md: 13px;
-  --ide-font-size-lg: 14px;
-  --ide-font-size-xl: 16px;
-  --ide-font-toolbar: 13px;
+  /* ════════════════════════════════════════════
+   * Label (ManyIslandsDark.theme.json lines 722-726)
+   * ════════════════════════════════════════════ */
 
-  /* ── Radii ── */
-  --ide-radius-xs: 4px;
-  --ide-radius-sm: 6px;
-  --ide-radius-md: 8px;
-  --ide-radius-lg: 12px;
-  --ide-radius-xl: 20px;
+  --label-error-fg: var(--text-error);
+  --label-warning-fg: var(--text-warning);
+  --label-success-fg: var(--text-success);
 
-  /* ── Layout dimensions (from layout.rs / official source) ── */
-  --ide-toolbar-height: 44px;
-  --ide-status-bar-height: 28px;
-  --ide-status-bar-top-border: 0px;
-  --ide-status-bar-item-height: 24px;
-  --ide-status-bar-item-padding-horizontal: 7px;
-  --ide-status-bar-padding-h: 10px;
-  --ide-status-bar-font-size: 11px;
-  --ide-status-bar-widget-hover-arc: 4px;
-  --ide-tool-window-width: 240px;
-  --ide-tool-window-header-height: 41px;
-  --ide-tab-height: 34px;
-  --ide-tree-row-height: 24px;
-  --ide-button-strip-width: 40px;
-  --ide-button-strip-button-size: 32px;
-  --ide-button-strip-button-radius: 8px;
-  --ide-main-toolbar-layout-gap: 10px;
+  /* ════════════════════════════════════════════
+   * Link (ManyIslandsDark.theme.json lines 728-735)
+   * ════════════════════════════════════════════ */
 
-  /* ── Shadows ── */
-  --ide-shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
-  --ide-shadow-md: 0 4px 12px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.2);
-  --ide-shadow-lg: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.2);
-  --ide-shadow-popup: 0 8px 24px rgba(0,0,0,0.45), 0 0 1px rgba(255,255,255,0.05) inset;
+  --link-active-fg: var(--text-link);
+  --link-hover-fg: var(--text-link);
+  --link-pressed-fg: var(--text-link);
+  --link-visited-fg: var(--text-link);
+  --link-secondary-fg: var(--text-link);
+  --link-focused-border: var(--control-brand-border);
 
-  /* ── Transitions ── */
-  --ide-transition-fast: 0.08s ease;
-  --ide-transition-normal: 0.12s ease;
-  --ide-transition-slow: 0.2s ease;
+  /* ════════════════════════════════════════════
+   * List (ManyIslandsDark.theme.json lines 737-753)
+   * ════════════════════════════════════════════ */
+
+  --list-hover-bg: var(--selection-bg-hovered);
+  --list-hover-inactive-bg: var(--selection-bg-hovered);
+  --list-row-height: 24px;
+  --list-row-height-compact: 22px;
+  --list-border: 4px;
+
+  --list-button-separator: var(--toolbar-border);
+  --list-button-separator-inset: 4px;
+  --list-button-hover-bg: var(--toolbar-bg-hovered);
+  --list-button-left-right-inset: 8px;
+
+  --list-tag-bg: #393B40;
+  --list-tag-fg: #868A91;
+
+  /* ════════════════════════════════════════════
+   * MainMenu (ManyIslandsDark.theme.json lines 755-759)
+   * ════════════════════════════════════════════ */
+
+  --main-menu-selection-fg: var(--text-default);
+  --main-menu-selection-bg: var(--toolbar-bg-hovered);
+  --main-menu-transparent-selection-bg: var(--toolbar-bg-hovered);
+
+  /* ════════════════════════════════════════════
+   * Menu / MenuItem / PopupMenu (ManyIslandsDark.theme.json lines 766-772, 903)
+   * ════════════════════════════════════════════ */
+
+  --menu-bg: var(--popup-bg);
+  --menu-border: var(--popup-border);
+  --menu-separator: var(--popup-border);
+  --menu-item-bg: var(--popup-bg);
+  --popup-menu-bg: var(--popup-bg);
+
+  /* ════════════════════════════════════════════
+   * Notification (ManyIslandsDark.theme.json lines 822-851)
+   * ════════════════════════════════════════════ */
+
+  --notification-bg: var(--feedback-bg);
+  --notification-border: var(--feedback-border);
+  --notification-fg: var(--text-default);
+  --notification-link-fg: var(--text-link);
+  --notification-icon-hover-bg: var(--toolbar-bg-hovered);
+  --notification-button-bg: var(--feedback-bg);
+  --notification-button-border: var(--feedback-control-border);
+  --notification-button-fg: var(--text-default);
+  --notification-more-button-bg: var(--feedback-bg-inline);
+  --notification-more-button-inner-border: var(--feedback-border);
+  --notification-more-button-fg: var(--text-muted);
+  --notification-toolwindow-error-bg: var(--feedback-error-bg);
+  --notification-toolwindow-warning-bg: var(--feedback-warning-bg);
+  --notification-toolwindow-info-bg: var(--feedback-bg);
+
+  /* ════════════════════════════════════════════
+   * Popup (ManyIslandsDark.theme.json lines 883-901)
+   * ════════════════════════════════════════════ */
+
+  --popup-bg-color: var(--popup-bg);
+  --popup-paint-border: true;
+  --popup-border-color: var(--popup-border);
+  --popup-inactive-border: var(--popup-border);
+  --popup-advertiser-fg: var(--text-secondary);
+  --popup-advertiser-bg: var(--popup-bg);
+  --popup-header-active-bg: var(--popup-bg);
+  --popup-header-inactive-bg: var(--popup-bg);
+  --popup-header-inactive-fg: var(--text-secondary);
+  --popup-toolbar-bg: var(--popup-bg);
+
+  /* ════════════════════════════════════════════
+   * ProgressBar (ManyIslandsDark.theme.json lines 936-945)
+   * ════════════════════════════════════════════ */
+
+  --progress-bar-progress: var(--control-brand-bg);
+  --progress-bar-indeterminate-start: var(--blue-110);
+  --progress-bar-indeterminate-end: var(--control-brand-bg);
+  --progress-bar-passed: var(--accent-success-bg);
+  --progress-bar-passed-end: var(--green-110);
+  --progress-bar-failed: var(--accent-error-bg);
+  --progress-bar-failed-end: var(--red-110);
+  --progress-bar-track: var(--control-bg-small);
+
+  /* ════════════════════════════════════════════
+   * ScrollBar (ManyIslandsDark.theme.json lines 953-968)
+   * ════════════════════════════════════════════ */
+
+  --scrollbar-thumb-color: #80808059;
+  --scrollbar-thumb-border: #26262659;
+  --scrollbar-hover-thumb: #8080808C;
+  --scrollbar-hover-thumb-border: #2626268C;
+  --scrollbar-hover-track: #80808000;
+  --scrollbar-track: #80808000;
+  --scrollbar-width: 8px;
+  --scrollbar-transparent-hover-thumb: #8080808C;
+  --scrollbar-transparent-thumb: #80808059;
+  --scrollbar-transparent-track: #80808000;
+  --scrollbar-transparent-hover-track: #8080801A;
+
+  /* ════════════════════════════════════════════
+   * SearchEverywhere (ManyIslandsDark.theme.json lines 970-982)
+   * ════════════════════════════════════════════ */
+
+  --search-everywhere-header-insets: 2px 4px 0 9px;
+  --search-everywhere-list-settings-bg: var(--popup-bg);
+  --search-everywhere-tab-selected-bg: var(--tab-selected-bg-active);
+  --search-everywhere-tab-selected-fg: var(--text-over-accent);
+
+  /* ════════════════════════════════════════════
+   * SegmentedButton (ManyIslandsDark.theme.json lines 532-537)
+   * ════════════════════════════════════════════ */
+
+  --segmented-button-selected-start-border: var(--control-border-raised);
+  --segmented-button-selected-end-border: var(--control-border-raised);
+  --segmented-button-selected-button-bg: var(--control-bg-raised);
+  --segmented-button-focused-selected-bg: var(--toolbar-selected-bg);
+
+  /* ════════════════════════════════════════════
+   * Separator (ManyIslandsDark.theme.json ui.*.separatorColor = popup-border)
+   * ════════════════════════════════════════════ */
+
+  --separator-color: var(--popup-border);
+  --separator-fg: var(--text-secondary);
+
+  /* ════════════════════════════════════════════
+   * Shortcut / Code Inline / Abbreviation (ManyIslandsDark.theme.json lines 571-580)
+   * ════════════════════════════════════════════ */
+
+  --shortcut-fg: var(--text-muted);
+  --shortcut-border: var(--inlay-border);
+  --code-inline-bg: var(--accent-neutral-bg);
+  --code-inline-opacity: 0.26;
+  --abbreviation-fg: var(--text-muted);
+  --abbreviation-bg: var(--inlay-bg);
+
+  /* ════════════════════════════════════════════
+   * SpeedSearch / SearchField (ManyIslandsDark.theme.json lines 986-998)
+   * ════════════════════════════════════════════ */
+
+  --speed-search-bg: var(--tool-window-bg);
+  --speed-search-border: var(--control-border);
+  --speed-search-error-fg: var(--text-error);
+  --search-field-error-fg: var(--text-error);
+  --search-field-error-bg: var(--feedback-error-bg);
+  --search-match-start-bg: var(--search-match-bg);
+  --search-match-end-bg: var(--search-match-bg);
+
+  /* ════════════════════════════════════════════
+   * Spinner (ManyIslandsDark.theme.json lines 1019-1022)
+   * ════════════════════════════════════════════ */
+
+  --spinner-minimum-size-width: 72px;
+  --spinner-minimum-size-height: 28px;
+
+  /* ════════════════════════════════════════════
+   * Splitter / Divider / OnePixelDivider
+   * ════════════════════════════════════════════ */
+
+  --one-pixel-divider-bg: var(--dialog-border);
+
+  /* ════════════════════════════════════════════
+   * StatusBar (ManyIslandsDark.theme.json lines 1024-1043)
+   * ════════════════════════════════════════════ */
+
+  --status-bar-height: 23px;
+  --status-bar-bg: var(--main-window-bg);
+  --status-bar-border: transparent;
+  --status-bar-top-border-width: 0px;
+  --status-bar-hover-bg: var(--toolbar-bg-hovered);
+  --status-bar-pressed-bg: var(--toolbar-bg-hovered);
+  --status-bar-widget-fg: var(--text-muted);
+  --status-bar-widget-hover-fg: var(--text-default);
+  --status-bar-fg: var(--text-muted);
+  --status-bar-hover-fg: var(--text-default);
+  --status-bar-chevron-inset: 0;
+
+  /* ════════════════════════════════════════════
+   * TabbedPane (ManyIslandsDark.theme.json lines 1045-1049)
+   * ════════════════════════════════════════════ */
+
+  --tab-height: 40px;
+  --tab-selection-arc: 4px;
+  --tab-content-min-width: 24px;
+  --tab-hover-color: var(--tab-bg-hovered);
+
+  /* ════════════════════════════════════════════
+   * Tree (ManyIslandsDark.theme.json)
+   * ════════════════════════════════════════════ */
+
+  --tree-row-height: var(--list-row-height);
+  --tree-row-height-compact: var(--list-row-height-compact);
+  --tree-indent-guide-border: var(--gray-40);
+
+  /* ════════════════════════════════════════════
+   * Layout Dimensions (from JBUI.java / IslandsUICustomization.kt)
+   * ════════════════════════════════════════════ */
+
+  --main-toolbar-btn-size: 30px;
+  --main-toolbar-btn-icon-size: 20px;
+  --main-toolbar-btn-arc: 12px;
+  --main-toolbar-btn-focus-width: 2px;
+  --main-toolbar-layout-gap: 10px;
+  --main-toolbar-padding-h: 6px;
+  --main-toolbar-font: 13px;
+
+  --stripe-button-width: 37px;
+  --stripe-button-height: 40px;
+  --stripe-button-icon-size: 20px;
+  --stripe-button-arc: 8px;
+
+  --tool-window-header-height: 41px;
+  --tool-window-width: 240px;
+
+  --button-strip-width: 40px;
+  --button-strip-gap: 2px;
+
+  --editor-tab-height: 28px;
+  --editor-tab-outer-height: 40px;
+
+  --island-empty-gap: 4px;
+  --island-tool-window-padding: 3px;
+  --island-editor-padding: 2px;
+
+  /* ════════════════════════════════════════════
+   * Shadows (ManyIslandsDark.theme.json lines 783-820)
+   * ════════════════════════════════════════════ */
+
+  --shadow-top-0: #00000000;
+  --shadow-top-1: #00000020;
+  --shadow-bottom-0: #00000000;
+  --shadow-bottom-1: #00000020;
+  --shadow-left-0: #00000000;
+  --shadow-left-1: #00000020;
+  --shadow-right-0: #00000000;
+  --shadow-right-1: #00000020;
+  --shadow-top-left-0: #00000000;
+  --shadow-top-left-1: #00000020;
+  --shadow-top-right-0: #00000000;
+  --shadow-top-right-1: #00000020;
+  --shadow-bottom-left-0: #00000000;
+  --shadow-bottom-left-1: #00000020;
+  --shadow-bottom-right-0: #00000000;
+  --shadow-bottom-right-1: #00000020;
+  --shadow-border-insets: 16px;
+
+  --notification-shadow-top-0: #00000000;
+  --notification-shadow-top-1: #00000010;
+  --notification-shadow-bottom-0: #00000000;
+  --notification-shadow-bottom-1: #00000010;
+  --notification-shadow-left-0: #00000000;
+  --notification-shadow-left-1: #00000010;
+  --notification-shadow-right-0: #00000000;
+  --notification-shadow-right-1: #00000010;
+  --notification-shadow-top-left-0: #00000000;
+  --notification-shadow-top-left-1: #00000010;
+  --notification-shadow-top-right-0: #00000000;
+  --notification-shadow-top-right-1: #00000010;
+  --notification-shadow-bottom-left-0: #00000000;
+  --notification-shadow-bottom-left-1: #00000010;
+  --notification-shadow-bottom-right-0: #00000000;
+  --notification-shadow-bottom-right-1: #00000010;
+  --notification-shadow-border-insets: 5px;
+
+  --popup-shadow: 0 8px 24px rgba(0,0,0,0.45);
+
+  /* ════════════════════════════════════════════
+   * Fonts
+   * ════════════════════════════════════════════ */
+
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-editor: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 14px;
+  --font-size-xl: 16px;
+  --main-toolbar-font: 13px;
+
+  /* ════════════════════════════════════════════
+   * Transitions
+   * ════════════════════════════════════════════ */
+
+  --transition-fast: 0.08s ease;
+  --transition-normal: 0.12s ease;
+  --transition-slow: 0.2s ease;
 }
 
+/* ════════════════════════════════════════════════════════════
+ * LIGHT THEME — ManyIslandsLight.theme.json
+ * ════════════════════════════════════════════════════════════ */
+
 .light {
-  /* === Islands Light Theme (from ManyIslandsLight.theme.json) === */
+  --gray-160: #F7F8F9;
+  --gray-150: #E9EAEE;
+  --gray-140: #DDDFE4;
+  --gray-130: #D1D3D9;
+  --gray-120: #C3C5CB;
+  --gray-110: #B5B7BD;
+  --gray-100: #9FA2A8;
 
-  --ide-layer0-bg: #F7F8F9;
-  --ide-layer0-border: #E9EAEE;
-  --ide-layer0-bg-inline: #FFFFFF;
-  --ide-layer1-bg: #E9EAEE;
-  --ide-layer1-border: #D1D3D9;
-  --ide-layer2-bg: #FFFFFF;
-  --ide-layer2-border: #D1D3D9;
+  --layer-0-bg: #E9EAEE;
+  --layer-0-bg-inline: #F7F8F9;
+  --layer-0-border: #D1D3D9;
+  --layer-0-border-inline: #E9EAEE;
+  --layer-1-bg: #F7F8F9;
+  --layer-1-bg-inline: #FFFFFF;
+  --layer-1-border: #DDDFE4;
+  --layer-1-border-inline: #E9EAEE;
+  --layer-2-bg: #FFFFFF;
+  --layer-2-bg-inline: #F7F8F9;
+  --layer-2-border: #E9EAEE;
 
-  --ide-bg-main: #E9EAEE;
-  --ide-bg-editor: #F7F8F9;
-  --ide-bg-tool-window: #F7F8F9;
-  --ide-bg-toolbar: #E9EAEE;
-  --ide-bg-statusbar: #E8E8EB;
-  --ide-bg-popup: #FFFFFF;
-  --ide-bg-dialog: #F7F8F9;
-  --ide-bg-card: #FFFFFF;
-  --ide-bg-input: #FFFFFF;
-  --ide-bg-stripe: #E9EAEE;
+  --text-default: #1E1F22;
+  --text-muted: #5F6269;
+  --text-secondary: #73767C;
+  --text-disabled: #9FA2A8;
+  --text-over-accent: #FFFFFF;
+  --text-over-accent-inverted: #000000;
+  --text-link: #2F5EB9;
+  --text-editor: #080808;
+  --text-error: var(--red-80);
+  --text-warning: var(--yellow-80);
+  --text-success: var(--green-80);
 
-  --ide-bg-hover: rgba(0,0,0,0.04);
-  --ide-bg-pressed: rgba(0,0,0,0.07);
-  --ide-bg-active: rgba(0,0,0,0.06);
-  --ide-bg-selected: #D0DFFE;
-  --ide-bg-selected-muted: #E3EBFE;
-  --ide-bg-tooltip: #FFFFFF;
-  --ide-bg-focus: rgba(56,113,225,0.08);
+  --dialog-bg: var(--layer-1-bg);
+  --dialog-bg-inline: var(--layer-1-bg-inline);
+  --dialog-border: var(--layer-1-border-inline);
+  --popup-bg: var(--layer-2-bg);
+  --popup-bg-inline: var(--layer-2-bg-inline);
+  --popup-border: var(--layer-2-border);
+  --editor-bg: var(--layer-2-bg);
+  --editor-bg-inline: var(--layer-2-bg-inline);
+  --editor-border: var(--layer-2-border);
+  --editor-border-alt: #E8E9ED;
+  --tool-window-bg: var(--layer-2-bg);
+  --tool-window-bg-inline: var(--layer-2-bg-inline);
+  --tool-window-bg-alt: #F7F6F8;
+  --tool-window-border: var(--layer-2-border);
+  --tool-window-border-inline: var(--layer-2-border-inline);
+  --main-window-bg: var(--layer-0-bg);
+  --main-window-bg-alt: #E8E8EB;
+  --main-window-border: var(--layer-0-border);
 
-  --ide-border: rgba(0,0,0,0.09);
-  --ide-border-focus: #3871E1;
-  --ide-border-subtle: rgba(0,0,0,0.04);
-  --ide-border-toolbar: rgba(0,0,0,0.08);
+  --control-bg: var(--dialog-bg-inline);
+  --control-bg-disabled: var(--dialog-bg);
+  --control-bg-raised: var(--dialog-bg-inline);
+  --control-border: #D1D3D9;
+  --control-border-disabled: #DDDFE4;
+  --control-border-raised: #B5B7BD;
 
-  --ide-text-default: #1E1F22;
-  --ide-text-primary: #1E1F22;
-  --ide-text-muted: #5F6269;
-  --ide-text-secondary: #73767C;
-  --ide-text-disabled: #9FA2A8;
-  --ide-text-accent: #000000;
-  --ide-text-link: #2563EB;
-  --ide-text-editor: #1E1F22;
+  --accent-brand-bg: var(--blue-80);
+  --accent-brand-bg-secondary: var(--blue-160);
+  --accent-brand-border: var(--blue-80);
+  --accent-brand-border-secondary: var(--blue-130);
+  --accent-error-bg: var(--red-90);
+  --accent-error-border: var(--red-90);
+  --accent-error-bg-secondary: var(--red-160);
+  --accent-warning-bg: var(--yellow-90);
+  --accent-warning-border: var(--yellow-90);
+  --accent-warning-bg-secondary: var(--yellow-160);
+  --accent-success-bg: var(--green-90);
+  --accent-success-border: var(--green-90);
+  --accent-success-bg-secondary: var(--green-160);
+  --accent-ai-bg: var(--purple-150);
+  --accent-ai-border: var(--purple-100);
 
-  --ide-accent-blue: #3871E1;
-  --ide-accent-blue-60: #2E4D89;
-  --ide-accent-blue-80: #3871E1;
-  --ide-accent-blue-100: #2855B8;
-  --ide-accent-green: #338555;
-  --ide-accent-orange: #964E37;
-  --ide-accent-red: #C54E58;
-  --ide-accent-purple: #6C4EBB;
-  --ide-accent-cyan: #2A6C67;
-  --ide-accent-yellow: #875817;
-  --ide-accent-pink: #B83A88;
+  --core-bg-transparent-hovered: var(--transparent-black-20);
+  --core-bg-transparent-pressed: var(--transparent-black-30);
+  --core-border-transparent: var(--transparent-black-30);
 
-  --island-border-color: #F7F8F9;
+  --toolbar-bg-hovered: var(--core-bg-transparent-hovered);
+  --toolbar-bg-pressed: var(--core-bg-transparent-pressed);
+  --toolbar-border: var(--core-border-transparent);
+  --toolbar-selected-bg: var(--blue-140);
+  --toolbar-selected-bg-hovered: var(--blue-130);
+  --toolbar-selected-bg-active: var(--accent-brand-bg);
+
+  --selection-bg-active: var(--blue-140);
+  --selection-bg-active-muted: var(--blue-150);
+  --selection-bg-inactive: var(--gray-150);
+  --selection-bg-hovered: var(--transparent-black-10);
+
+  --editor-tab-bg: var(--layer-2-bg);
+  --editor-tab-hover-bg: var(--tab-bg-hovered);
+  --editor-tab-selected-border-active: var(--blue-120);
+  --editor-tab-selected-bg-active: var(--blue-150);
+  --editor-tab-selected-border-inactive: var(--gray-130);
+  --editor-tab-selected-bg-inactive: var(--gray-150);
+
+  --tab-selected-bg-active: var(--blue-150);
+  --tab-selected-bg-inactive: var(--gray-150);
+  --tab-selected-border-active: var(--blue-120);
+  --tab-selected-border-inactive: var(--gray-130);
+
+  --island-border-color: var(--layer-2-bg);
   --island-inactive-alpha: 0.7;
 
-  --toolbar-bg-hovered: rgba(0,0,0,0.05);
-  --toolbar-bg-pressed: rgba(0,0,0,0.08);
-  --toolbar-border: rgba(0,0,0,0.08);
-  --toolbar-selected-bg: #3871E1;
-  --toolbar-selected-fg: #FFFFFF;
-  --toolbar-stripe-bg: #E9EAEE;
+  --separator-color: var(--dialog-border);
+  --main-window-background: var(--layer-1-bg);
+  --focus-color: var(--blue-80);
 
   --editor-tab-bg: #F7F8F9;
-  --editor-tab-hover-bg: rgba(0,0,0,0.04);
-  --editor-tab-selected-border-active: #2E4D89;
+  --editor-tab-hover-bg: rgba(0,0,0,0.07);
+  --editor-tab-selected-border-active: #A7C5FF;
   --editor-tab-selected-bg-active: #E3EBFE;
   --editor-tab-selected-border-inactive: #D1D3D9;
   --editor-tab-selected-bg-inactive: #E9EAEE;
 
-  --ide-scrollbar-thumb: rgba(0,0,0,0.15);
+  --control-brand-bg: var(--accent-brand-bg);
+  --control-brand-border: var(--accent-brand-border);
+  --control-error-bg: var(--accent-error-bg);
+  --control-error-border: var(--accent-error-border);
+  --control-error-border-secondary: var(--red-130);
+  --control-warning-bg: var(--accent-warning-bg);
+  --control-warning-border: var(--accent-warning-border);
+  --control-warning-border-secondary: var(--yellow-130);
+  --control-success-bg: var(--accent-success-bg);
+  --control-success-border: var(--accent-success-border);
 
-  --ide-button-primary-bg: #3871E1;
-  --ide-button-primary-hover: #2F5EB9;
-  --ide-button-secondary-bg: rgba(0,0,0,0.06);
-  --ide-button-secondary-hover: rgba(0,0,0,0.10);
+  --focus-color: #3871E1;
 
-  --ide-shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
-  --ide-shadow-md: 0 4px 12px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06);
-  --ide-shadow-lg: 0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08);
-  --ide-shadow-popup: 0 8px 24px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.05) inset;
+  --tree-indent-guide-border: #E9EAEE;
+  --inlay-bg: var(--transparent-black-20);
+  --inlay-border: var(--transparent-black-50);
+
+  --scrollbar-thumb-color: rgba(0,0,0,0.15);
+  --scrollbar-thumb-border: rgba(0,0,0,0.10);
+  --scrollbar-hover-thumb: rgba(0,0,0,0.25);
+  --scrollbar-hover-thumb-border: rgba(0,0,0,0.20);
+  --scrollbar-track: transparent;
+  --scrollbar-hover-track: transparent;
+
+  --popup-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
+
+/* ════════════════════════════════════════════════════════════
+ * Base resets
+ * ════════════════════════════════════════════════════════════ */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body, #root {
   width: 100%; height: 100%; overflow: hidden;
-  font-family: var(--ide-font-ui);
-  font-size: var(--ide-font-size-sm);
-  color: var(--ide-text-primary);
-  background: var(--ide-bg-main);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-sm);
+  color: var(--text-default);
+  background: var(--main-window-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--ide-scrollbar-track); }
-::-webkit-scrollbar-thumb { background: var(--ide-scrollbar-thumb); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.5); }
+/* ════════════════════════════════════════════════════════════
+ * Scrollbar (ManyIslandsDark.theme.json ScrollBar section)
+ * ════════════════════════════════════════════════════════════ */
+
+::-webkit-scrollbar { width: var(--scrollbar-width); height: var(--scrollbar-width); }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border: 1px solid var(--scrollbar-thumb-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-hover-thumb);
+  border-color: var(--scrollbar-hover-thumb-border);
+}

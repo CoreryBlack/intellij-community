@@ -1,11 +1,15 @@
 use std::sync::Mutex;
 
+mod button_look;
 mod commands;
+mod frontend;
 mod fs;
 mod layout;
+mod main_toolbar;
+mod menu;
 mod statusbar;
 mod terminal;
-mod toolbar;
+mod welcome;
 
 pub use commands::*;
 pub use fs::*;
@@ -89,8 +93,11 @@ pub struct AppState {
     pub active_tool_window: Mutex<String>,
     pub layout_descriptor: layout::LayoutDescriptor,
     pub terminal_manager: terminal::TerminalManager,
-    pub toolbar_manager: toolbar::ToolbarManager,
+    pub main_toolbar_manager: main_toolbar::ToolbarManager,
+    pub toolbar_frontend: frontend::ToolbarFrontend,
     pub statusbar_manager: statusbar::StatusBarManager,
+    pub menu_manager: menu::MenuManager,
+    pub welcome_manager: welcome::WelcomeScreenManager,
 }
 
 impl Default for AppState {
@@ -121,8 +128,11 @@ impl Default for AppState {
             active_tool_window: Mutex::new("project".into()),
             layout_descriptor: lt,
             terminal_manager: terminal::TerminalManager::new(),
-            toolbar_manager: toolbar::ToolbarManager::new(),
+            main_toolbar_manager: main_toolbar::ToolbarManager::new(),
+            toolbar_frontend: frontend::ToolbarFrontend::new(),
             statusbar_manager: statusbar::StatusBarManager::new(),
+            menu_manager: menu::MenuManager::new(),
+            welcome_manager: welcome::WelcomeScreenManager::new(),
         }
     }
 }
@@ -161,10 +171,13 @@ pub fn run() {
             terminal::get_problems,
             terminal::get_services,
             terminal::run_command,
-            toolbar::get_toolbar_descriptor,
-            toolbar::update_project_info,
-            toolbar::update_git_state,
-            toolbar::update_active_file,
+            main_toolbar::get_toolbar_descriptor,
+            main_toolbar::update_project_info,
+            main_toolbar::update_git_state,
+            main_toolbar::update_active_file,
+            frontend::toolbar_event,
+            frontend::get_frontend_toolbar,
+            frontend::toolbar_click,
             statusbar::get_status_bar_descriptor,
             statusbar::update_status_cursor,
             statusbar::update_status_encoding,
@@ -173,6 +186,12 @@ pub fn run() {
             statusbar::update_status_read_only,
             statusbar::update_status_info_message,
             statusbar::update_status_indent_style,
+            menu::get_main_menu,
+            menu::get_dropdown_menu,
+            welcome::get_welcome_screen,
+            welcome::welcome_set_active_tab,
+            statusbar::update_status_memory,
+            statusbar::toggle_memory_indicator,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

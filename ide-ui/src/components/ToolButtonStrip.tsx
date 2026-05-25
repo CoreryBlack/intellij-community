@@ -37,36 +37,33 @@ interface Props {
 
 const TOP_STRIPE_TOOLS: { id: ToolWindow; icon: string; title: string }[] = [
   { id: "project", icon: "project", title: "Project (Alt+1)" },
-  { id: "search", icon: "search", title: "Search (Shift+Shift)" },
-  { id: "git", icon: "git", title: "Git (Alt+9)" },
+  { id: "search", icon: "find", title: "Search (Shift+Shift)" },
+  { id: "git", icon: "vcs", title: "Git (Alt+9)" },
   { id: "run", icon: "run", title: "Run (Alt+4)" },
   { id: "structure", icon: "structure", title: "Structure (Alt+7)" },
 ];
 
 function ToolIcon({ type, size = 20 }: { type: string; size?: number }) {
-  const s = size;
-  switch (type) {
-    case "project":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="currentColor"><path d="M2.5 4a1 1 0 0 1 1-1h5.086a1 1 0 0 1 .707.293l1.414 1.414a1 1 0 0 0 .707.293H16.5a1 1 0 0 1 1 1V16a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1V4z" /></svg>;
-    case "search":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="8.5" cy="8.5" r="5.5" /><path d="M13 13l4 4" strokeLinecap="round" /></svg>;
-    case "git":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="currentColor"><path d="M10 1a3 3 0 0 0-2.83 4.02L4.02 8.17a3 3 0 1 0 1.41 1.41l3.15-3.15A3 3 0 1 0 10 1zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM5 12a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" /></svg>;
-    case "run":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="currentColor"><path d="M5 3v14l11-7z" /></svg>;
-    case "structure":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="14" height="3" rx="1" /><rect x="3" y="9" width="6" height="3" rx="1" /><rect x="11" y="9" width="6" height="3" rx="1" /><rect x="3" y="15" width="14" height="2" rx="1" /></svg>;
-    case "terminal":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="currentColor"><path d="M3 4h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm2 3l3 3-3 3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-    case "problems":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="currentColor"><path d="M10 2l8 14H2L10 2zm0 3L5 14h10L10 5zm-1 3v3h2V8H9zm0 4v1h2v-1H9z" /></svg>;
-    case "services":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="currentColor"><path d="M4 4h4v4H4V4zm0 8h4v4H4v-4zm8-8h4v4h-4V4zm0 8h4v4h-4v-4z" /></svg>;
-    case "collapse":
-      return <svg width={s} height={s} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M7 4l5 6-5 6" /></svg>;
-    default:
-      return null;
+  const iconMap: Record<string, string> = {
+    project: "project",
+    find: "find",
+    vcs: "vcs",
+    run: "run",
+    structure: "structure",
+    services: "services",
+    problems: "problems",
+  };
+  const officialName = iconMap[type];
+  if (officialName) {
+    return <img src={`/icons/${officialName}.svg`} width={size} height={size} alt="" style={{ display: "block" }} />;
   }
+  if (type === "terminal") {
+    return <svg width={size} height={size} viewBox="0 0 20 20" fill="currentColor"><path d="M3 4h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm2 3l3 3-3 3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  }
+  if (type === "collapse") {
+    return <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M7 4l5 6-5 6" /></svg>;
+  }
+  return null;
 }
 
 export default function ToolButtonStrip({ activeTool, onSelectTool, showSidebar, onToggleSidebar, showBottomPanel, onToggleBottomPanel }: Props) {

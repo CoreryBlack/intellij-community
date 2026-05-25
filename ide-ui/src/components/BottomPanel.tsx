@@ -93,7 +93,7 @@ export default function BottomPanel({ bottomPanelTab, onBottomPanelTab, onHide, 
               title="Split Right"
               onMouseOver={e => e.currentTarget.style.background = "var(--ide-bg-hover)"}
               onMouseOut={e => e.currentTarget.style.background = "transparent"}
-            >⊞</button>
+            ><img src="/icons/splitVertically.svg" width={12} height={12} alt="" style={{ display: "block" }} /></button>
             <button onClick={onHide} style={{
               width: 22,
               height: 22,
@@ -111,7 +111,7 @@ export default function BottomPanel({ bottomPanelTab, onBottomPanelTab, onHide, 
             }}
               onMouseOver={e => e.currentTarget.style.background = "var(--ide-bg-hover)"}
               onMouseOut={e => e.currentTarget.style.background = "transparent"}
-            >✕</button>
+            ><img src="/icons/close.svg" width={12} height={12} alt="" style={{ display: "block" }} /></button>
           </div>
         </div>
 

@@ -1,6 +1,95 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import './theme.css';
 
+/*
+ * Compatibility mappings: old --ide-* variable names → new official names.
+ * All new code should use the official names from ManyIslands*.theme.json.
+ */
+:root {
+  --ide-font-ui: var(--font-ui);
+  --ide-font-editor: var(--font-editor);
+  --ide-font-size-xs: var(--font-size-xs);
+  --ide-font-size-sm: var(--font-size-sm);
+  --ide-font-size-md: var(--font-size-md);
+  --ide-font-size-lg: var(--font-size-lg);
+  --ide-font-size-xl: var(--font-size-xl);
+
+  --ide-text-primary: var(--text-default);
+  --ide-text-default: var(--text-default);
+  --ide-text-muted: var(--text-muted);
+  --ide-text-secondary: var(--text-secondary);
+  --ide-text-disabled: var(--text-disabled);
+  --ide-text-link: var(--text-link);
+  --ide-text-editor: var(--text-editor);
+
+  --ide-bg-main: var(--main-window-bg);
+  --ide-bg-editor: var(--editor-bg);
+  --ide-bg-tool-window: var(--tool-window-bg);
+  --ide-bg-toolbar: var(--main-window-bg);
+  --ide-bg-statusbar: var(--main-window-bg);
+  --ide-bg-popup: var(--popup-bg);
+  --ide-bg-dialog: var(--dialog-bg);
+  --ide-bg-stripe: var(--main-window-bg);
+  --ide-bg-hover: var(--toolbar-bg-hovered);
+  --ide-bg-pressed: var(--toolbar-bg-pressed);
+  --ide-bg-selected: var(--selection-bg-active);
+  --ide-bg-selected-muted: var(--selection-bg-active-muted);
+
+  --ide-accent-blue: var(--accent-brand-bg);
+  --ide-accent-green: var(--accent-success-bg);
+  --ide-accent-red: var(--accent-error-bg);
+
+  --ide-border: var(--tool-window-border);
+  --ide-border-toolbar: var(--toolbar-border);
+  --ide-border-popup: var(--popup-border);
+  --ide-border-subtle: var(--popup-border);
+  --ide-border-focus: var(--focus-color);
+
+  --ide-scrollbar-thumb: var(--scrollbar-thumb-color);
+  --ide-scrollbar-track: var(--scrollbar-track);
+
+  --ide-toolbar-height: calc(var(--main-toolbar-btn-size) + 14px);
+  --ide-status-bar-height: var(--status-bar-height);
+  --ide-status-bar-top-border: var(--status-bar-top-border-width);
+  --ide-status-bar-padding-h: 10px;
+  --ide-status-bar-font-size: var(--font-size-xs);
+  --ide-status-bar-item-height: 21px;
+  --ide-status-bar-item-padding-horizontal: 7px;
+  --ide-status-bar-widget-hover-arc: 4px;
+  --ide-tool-window-width: var(--tool-window-width);
+  --ide-tool-window-header-height: var(--tool-window-header-height);
+  --ide-tab-height: var(--tab-height);
+  --ide-tree-row-height: var(--tree-row-height);
+
+  --ide-main-toolbar-btn-size: var(--main-toolbar-btn-size);
+  --ide-main-toolbar-btn-icon-size: var(--main-toolbar-btn-icon-size);
+  --ide-main-toolbar-btn-arc: var(--main-toolbar-btn-arc);
+  --ide-main-toolbar-btn-focus-ring: var(--main-toolbar-btn-focus-width);
+  --ide-main-toolbar-btn-text-padding: 2px 8px;
+  --ide-main-toolbar-layout-gap: var(--main-toolbar-layout-gap);
+
+  --toolbar-button-arc: var(--main-toolbar-btn-arc);
+  --toolbar-stripe-button-width: var(--stripe-button-width);
+  --toolbar-stripe-button-height: var(--stripe-button-height);
+  --toolbar-stripe-button-icon-size: var(--stripe-button-icon-size);
+  --toolbar-stripe-button-arc: var(--stripe-button-arc);
+
+  --ide-shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
+  --ide-shadow-md: 0 4px 12px rgba(0,0,0,0.35);
+  --ide-shadow-lg: 0 8px 32px rgba(0,0,0,0.45);
+
+  --ide-transition-fast: 0.08s ease;
+  --ide-transition-normal: 0.12s ease;
+  --ide-transition-slow: 0.2s ease;
+
+  --ide-focus-color: var(--focus-color);
+  --ide-radius-xs: 4px;
+  --ide-radius-sm: 6px;
+  --ide-radius-md: 8px;
+  --ide-radius-lg: 12px;
+  --ide-radius-xl: 20px;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -14,10 +103,10 @@ html, body, #root {
 }
 
 body {
-  font-family: var(--ide-font-ui);
-  font-size: var(--ide-font-size-md);
-  color: var(--ide-text-primary);
-  background-color: var(--ide-bg-main);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-md);
+  color: var(--text-default);
+  background-color: var(--main-window-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;
@@ -29,20 +118,20 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--ide-scrollbar-track);
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--ide-scrollbar-thumb);
+  background: var(--scrollbar-thumb-color);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--scrollbar-hover-thumb);
 }
 
 ::selection {
-  background: var(--ide-accent-blue);
+  background: var(--accent-brand-bg);
   color: white;
 }
 
@@ -52,7 +141,7 @@ input, textarea, select, button {
 }
 
 a {
-  color: var(--ide-accent-blue);
+  color: var(--text-link);
   text-decoration: none;
 }
 

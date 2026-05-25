@@ -98,7 +98,7 @@ export default function App() {
           <WelcomeScreen
             onOpenProject={handleOpenProject}
             onNewProject={handleNewProject}
-            theme={state.theme}
+            _theme={state.theme}
             onToggleTheme={() => dispatch({ type: "TOGGLE_THEME" })}
           />
         ) : (
