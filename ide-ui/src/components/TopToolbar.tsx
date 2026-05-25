@@ -31,6 +31,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import ToolbarDropdown, { type MenuItem } from "./ToolbarDropdown";
+import { getToolbarDescriptor, toolbarEvent, toolbarClick, type ToolbarDescriptor as RustToolbarDescriptor, type ToolbarEventResult as RustToolbarEventResult } from "../services/ideService";
 
 /* ═══════════════════════════════════════════
  * RUST BACKEND TYPES — exact mirror of
@@ -666,15 +667,23 @@ export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme
   } | null>(null);
 
   useEffect(() => {
-    const d = FALLBACK_TOOLBAR_DESCRIPTOR(projectName);
-    setDescriptor(d);
-    const m = new Map<string, ToolbarButtonDesc>();
-    for (const g of d.groups) {
-      for (const b of g.buttons) {
-        m.set(b.presentation.id, b);
+    (async () => {
+      let d: ToolbarDescriptor;
+      try {
+        const rustDescriptor: RustToolbarDescriptor = await getToolbarDescriptor();
+        d = rustDescriptor as unknown as ToolbarDescriptor;
+      } catch {
+        d = FALLBACK_TOOLBAR_DESCRIPTOR(projectName);
       }
-    }
-    setButtonMap(m);
+      setDescriptor(d);
+      const m = new Map<string, ToolbarButtonDesc>();
+      for (const g of d.groups) {
+        for (const b of g.buttons) {
+          m.set(b.presentation.id, b);
+        }
+      }
+      setButtonMap(m);
+    })();
   }, [projectName]);
 
   const mainMenu = FALLBACK_MAIN_MENU();
@@ -683,54 +692,83 @@ export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme
     id: string,
     eventType: string,
   ) => {
-    const result = fallbackHandleEvent(descriptor, id, eventType);
-    if (!result) return;
-
-    // Update the single button in the map
-    setButtonMap(prev => {
-      const next = new Map(prev);
-      next.set(id, result.button);
-      return next;
-    });
-
-    // If Rust returns an action, execute it
-    if (result.action === "show_menu") {
-      const btn = descriptor.groups.flatMap(g => g.buttons).find(b => b.presentation.id === id);
-      if (!btn) return;
-
-      if (id === "MainMenuButton") {
-        // Find the button element in the DOM and get its rect
-        const el = document.querySelector(`[title="${btn.presentation.tooltip || btn.presentation.text}"]`);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          setDropdownState({
-            triggerId: id,
-            triggerRect: rect,
-            items: mainMenu,
-          });
-        }
+    (async () => {
+      let result: ToolbarEventResult | null;
+      try {
+        const rustResult: RustToolbarEventResult | null = await toolbarEvent(id, eventType);
+        result = rustResult as unknown as ToolbarEventResult | null;
+      } catch {
+        result = fallbackHandleEvent(descriptor, id, eventType);
       }
-    } else if (result.action === "click" || result.action === "show_main_menu") {
-      switch (id) {
-        case "MainMenuButton":
-          const el = document.querySelector('[title="Main Menu"]');
+      if (!result) return;
+
+      setButtonMap(prev => {
+        const next = new Map(prev);
+        next.set(id, result!.button);
+        return next;
+      });
+
+      if (result.action === "show_menu") {
+        const btn = descriptor.groups.flatMap(g => g.buttons).find(b => b.presentation.id === id);
+        if (!btn) return;
+
+        if (id === "MainMenuButton") {
+          const el = document.querySelector(`[title="${btn.presentation.tooltip || btn.presentation.text}"]`);
           if (el) {
+            const rect = el.getBoundingClientRect();
             setDropdownState({
               triggerId: id,
-              triggerRect: el.getBoundingClientRect(),
+              triggerRect: rect,
               items: mainMenu,
             });
           }
-          break;
-        case "SearchEverywhere":
-        case "SearchEverywhere.Right":
-          onSearchEverywhere();
-          break;
-        case "SettingsEntryPoint":
-          onOpenSettings();
-          break;
+        }
+      } else if (result.action === "click" || result.action === "show_main_menu") {
+        try {
+          const clickAction = await toolbarClick(id);
+          switch (clickAction) {
+            case "show_main_menu": {
+              const el = document.querySelector('[title="Main Menu"]');
+              if (el) {
+                setDropdownState({
+                  triggerId: id,
+                  triggerRect: el.getBoundingClientRect(),
+                  items: mainMenu,
+                });
+              }
+              break;
+            }
+            case "search_everywhere":
+              onSearchEverywhere();
+              break;
+            case "open_settings":
+              onOpenSettings();
+              break;
+          }
+        } catch {
+          switch (id) {
+            case "MainMenuButton": {
+              const el = document.querySelector('[title="Main Menu"]');
+              if (el) {
+                setDropdownState({
+                  triggerId: id,
+                  triggerRect: el.getBoundingClientRect(),
+                  items: mainMenu,
+                });
+              }
+              break;
+            }
+            case "SearchEverywhere":
+            case "SearchEverywhere.Right":
+              onSearchEverywhere();
+              break;
+            case "SettingsEntryPoint":
+              onOpenSettings();
+              break;
+          }
+        }
       }
-    }
+    })();
   }, [descriptor, mainMenu, onBackToWelcome, onSearchEverywhere, onToggleTheme, onOpenSettings]);
 
   const renderButtons = (buttons: ToolbarButtonDesc[]) =>

@@ -9,7 +9,8 @@
  * ZERO hardcoded local data. Every string, icon, tab, project comes from Rust.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getWelcomeScreen, welcomeSetActiveTab, openProject, type WelcomeScreenDescriptor as RustWelcomeDescriptor } from "../services/ideService";
 
 /* ── Rust backend types (direct port of welcome.rs) ── */
 
@@ -149,17 +150,47 @@ export default function WelcomeScreen({ onOpenProject, onNewProject, onToggleThe
   const [welcome, setWelcome] = useState<WelcomeScreenDescriptor>(FALLBACK_WELCOME);
   const [searchQuery, setSearchQuery] = useState("");
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const data: RustWelcomeDescriptor = await getWelcomeScreen();
+        setWelcome(prev => ({
+          ...prev,
+          ...data,
+          project_groups: prev.project_groups,
+          speed_search: prev.speed_search,
+          project_preview: prev.project_preview,
+        }));
+      } catch {
+        // fallback to FALLBACK_WELCOME (already set as initial state)
+      }
+    })();
+  }, []);
+
   const handleQuickAction = (action: QuickAction) => {
     switch (action.id) {
       case "NewProject": onNewProject(); break;
-      case "Open": onOpenProject(""); break;
+      case "Open": handleOpenProject(""); break;
       case "toggle_theme": onToggleTheme(); break;
     }
   };
 
   const handleTabClick = (tabId: string) => {
+    try {
+      welcomeSetActiveTab(tabId);
+    } catch {
+      // fallback to local state update
+    }
     const tabs = welcome.tabs.map(t => ({ ...t, selected: t.id === tabId }));
     setWelcome(prev => ({ ...prev, active_tab_id: tabId, tabs }));
+  };
+
+  const handleOpenProject = (path: string) => {
+    try {
+      openProject(path);
+    } catch {
+      onOpenProject(path);
+    }
   };
 
   /* ── Speed search filtering (port of RecentProjectPanel ListWithFilter) ── */
@@ -272,7 +303,7 @@ export default function WelcomeScreen({ onOpenProject, onNewProject, onToggleThe
                     {searchQuery ? `No projects matching "${searchQuery}"` : "No recent projects"}
                   </div>
                 ) : filteredProjects.map((p, i) => (
-                  <div key={p.path} onClick={() => p.valid && onOpenProject(p.path)}
+                  <div key={p.path} onClick={() => p.valid && handleOpenProject(p.path)}
                     style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", cursor: p.valid ? "pointer" : "default", transition: "background 0.08s ease", opacity: p.valid ? 1 : 0.5, borderBottom: i < filteredProjects.length - 1 ? "1px solid var(--editor-border)" : "none" }}
                     onMouseEnter={e => { if (p.valid) e.currentTarget.style.background = "var(--toolbar-bg-hovered)"; }}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}>

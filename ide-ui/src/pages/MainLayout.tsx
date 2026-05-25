@@ -41,8 +41,10 @@ import Sidebar from "../components/Sidebar";
 import StatusBar from "../components/StatusBar";
 import EditorArea from "../components/EditorArea";
 import BottomPanel from "../components/BottomPanel";
+import Resizer from "../components/Resizer";
 import { useIdeStore, type ToolWindowId } from "../store/ideStore";
 import { readDirectory, readFileContent, getFileLang } from "../services/fileSystem";
+import { updateProjectInfo, updateActiveFile, updateStatusLanguage } from "../services/ideService";
 import { notify } from "../components/NotificationStack";
 
 /* ── Official Islands layout constants (IslandsUICustomization.kt) ──
@@ -73,6 +75,8 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
     readDirectory(projectPath).then(entries => {
       dispatch({ type: "SET_FILE_TREE", entries });
     });
+    const projectName = projectPath.split("/").pop()?.split("\\").pop() || "Project";
+    updateProjectInfo(projectName, projectPath).catch(() => {});
   }, [projectPath]);
 
   const handleSelectTool = (id: ToolWindowId) => {
@@ -94,6 +98,7 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
     const existing = state.openFiles.find(f => f.path === filePath);
     if (existing) {
       dispatch({ type: "SET_ACTIVE_FILE", path: filePath });
+      updateActiveFile(fileName).catch(() => {});
       return;
     }
     const content = await readFileContent(filePath);
@@ -110,6 +115,8 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
         cursorCol: 1,
       },
     });
+    updateActiveFile(fileName).catch(() => {});
+    updateStatusLanguage(getFileLang(fileName)).catch(() => {});
   };
 
   const currentProject = projectPath.split("/").pop()?.split("\\").pop() || "Project";
@@ -171,31 +178,43 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
           paddingRight: ISLAND_GAP,
           paddingBottom: ISLAND_GAP,
         }}>
-          <div style={{ flex: 1, display: "flex", overflow: "hidden", gap: ISLAND_GAP, minHeight: 0 }}>
+          <div style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>
             {/* Sidebar — self-islanded via Sidebar.tsx XNextIslandHolder-style inset */}
             {state.sidebarVisible && (
-              <Sidebar
-                activeTool={state.activeToolWindow || "project"}
-                projectPath={state.projectPath}
-                fileTree={state.fileTree}
-                onOpenFile={handleOpenFile}
-                onContextMenu={(e, path, name) => {
-                  e.preventDefault();
-                  dispatch({
-                    type: "SHOW_CONTEXT_MENU",
-                    menu: {
-                      x: e.clientX, y: e.clientY,
-                      items: [
-                        { label: "Open", shortcut: "Enter", action: () => handleOpenFile(path, name) },
-                        { label: "Copy Path", shortcut: "Ctrl+Shift+C", action: () => { navigator.clipboard.writeText(path); notify(dispatch, "info", "Copied", path); } },
-                        { label: "Copy Relative Path", action: () => { navigator.clipboard.writeText(path.replace(state.projectPath, "")); notify(dispatch, "info", "Copied", path); } },
-                        { label: "", separator: true, action: () => {} },
-                        { label: "Reveal in Explorer", action: () => {} },
-                      ],
-                    },
-                  });
-                }}
-              />
+              <>
+                <div style={{ width: state.sidebarWidth, flexShrink: 0, display: "flex" }}>
+                  <Sidebar
+                    activeTool={state.activeToolWindow || "project"}
+                    projectPath={state.projectPath}
+                    fileTree={state.fileTree}
+                    onOpenFile={handleOpenFile}
+                    onContextMenu={(e, path, name) => {
+                      e.preventDefault();
+                      dispatch({
+                        type: "SHOW_CONTEXT_MENU",
+                        menu: {
+                          x: e.clientX, y: e.clientY,
+                          items: [
+                            { label: "Open", shortcut: "Enter", action: () => handleOpenFile(path, name) },
+                            { label: "Copy Path", shortcut: "Ctrl+Shift+C", action: () => { navigator.clipboard.writeText(path); notify(dispatch, "info", "Copied", path); } },
+                            { label: "Copy Relative Path", action: () => { navigator.clipboard.writeText(path.replace(state.projectPath, "")); notify(dispatch, "info", "Copied", path); } },
+                            { label: "", separator: true, action: () => {} },
+                            { label: "Reveal in Explorer", action: () => {} },
+                          ],
+                        },
+                      });
+                    }}
+                  />
+                </div>
+                <Resizer
+                  direction="horizontal"
+                  size={state.sidebarWidth}
+                  minSize={150}
+                  maxSize={750}
+                  defaultSize={250}
+                  onSizeChange={(width) => dispatch({ type: "SET_SIDEBAR_WIDTH", width })}
+                />
+              </>
             )}
 
             {/* EditorArea — self-islanded via EditorArea.tsx Editor island-style inset */}
@@ -226,12 +245,24 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
 
           {/* BottomPanel — self-islanded via BottomPanel.tsx XNextIslandHolder-style inset */}
           {state.bottomPanelVisible && (
-            <BottomPanel
-              bottomPanelTab={state.bottomPanelTab}
-              onBottomPanelTab={(tab) => dispatch({ type: "SET_BOTTOM_TAB", tab })}
-              onHide={() => dispatch({ type: "TOGGLE_BOTTOM_PANEL" })}
-              projectPath={state.projectPath}
-            />
+            <>
+              <Resizer
+                direction="vertical"
+                size={state.bottomPanelHeight}
+                minSize={100}
+                maxSize={600}
+                defaultSize={200}
+                onSizeChange={(height) => dispatch({ type: "SET_BOTTOM_PANEL_HEIGHT", height })}
+              />
+              <div style={{ height: state.bottomPanelHeight, flexShrink: 0, display: "flex" }}>
+                <BottomPanel
+                  bottomPanelTab={state.bottomPanelTab}
+                  onBottomPanelTab={(tab) => dispatch({ type: "SET_BOTTOM_TAB", tab })}
+                  onHide={() => dispatch({ type: "TOGGLE_BOTTOM_PANEL" })}
+                  projectPath={state.projectPath}
+                />
+              </div>
+            </>
           )}
         </div>
 

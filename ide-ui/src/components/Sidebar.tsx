@@ -180,11 +180,10 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
 
   return (
     <div style={{
-      width: "var(--ide-tool-window-width)",
+      flex: 1,
       display: "flex",
       flexDirection: "column",
       overflow: "hidden",
-      flexShrink: 0,
       borderRadius: "var(--island-arc)",
       background: "var(--layer-0-bg)",
       padding: "var(--island-tool-window-padding)",

@@ -13,7 +13,8 @@
  *        MemoryIndicator — rightmost position
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { getStatusBarDescriptor, type StatusBarDescriptor as RustStatusBarDescriptor } from "../services/ideService";
 
 interface StatusBarWidgetStyle {
   hover: boolean;
@@ -214,7 +215,17 @@ function MemoryIndicator({ memory }: { memory: MemoryInfo }) {
 }
 
 export default function StatusBar({ theme, onToggleTheme, onOpenSettings }: Props) {
-  const [descriptor] = useState<StatusBarDescriptor>(() => FALLBACK_STATUS_BAR_DESCRIPTOR());
+  const [descriptor, setDescriptor] = useState<StatusBarDescriptor>(() => FALLBACK_STATUS_BAR_DESCRIPTOR());
+
+  useEffect(() => {
+    getStatusBarDescriptor()
+      .then((data: RustStatusBarDescriptor) => {
+        setDescriptor({ ...FALLBACK_STATUS_BAR_DESCRIPTOR(), ...data });
+      })
+      .catch(() => {
+        // fallback already set in useState initializer
+      });
+  }, []);
 
   const visibleLeft = descriptor.left_widgets.filter(w => w.visible);
   const visibleCenter = descriptor.center_widgets.filter(w => w.visible);

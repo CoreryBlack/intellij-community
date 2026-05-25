@@ -25,6 +25,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { getSettingsDescriptor, settingsSelectConfigurable, settingsSearch, settingsApply, settingsReset } from "../services/ideService";
 
 interface ConfigurableItem {
   id: string;
@@ -559,11 +560,17 @@ function filterItems(items: ConfigurableItem[], query: string): ConfigurableItem
 }
 
 export default function SettingsDialog({ onClose }: Props) {
-  const [descriptor] = useState<SettingsDescriptor>(() => FALLBACK_SETTINGS);
+  const [descriptor, setDescriptor] = useState<SettingsDescriptor>(() => FALLBACK_SETTINGS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    getSettingsDescriptor()
+      .then(data => setDescriptor(data))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -579,6 +586,7 @@ export default function SettingsDialog({ onClose }: Props) {
 
   const handleSelect = useCallback((id: string) => {
     setSelectedId(id);
+    settingsSelectConfigurable(id).catch(() => {});
   }, []);
 
   const handleToggle = useCallback((id: string) => {
@@ -589,6 +597,10 @@ export default function SettingsDialog({ onClose }: Props) {
       return next;
     });
   }, []);
+
+  useEffect(() => {
+    settingsSearch(searchQuery).catch(() => {});
+  }, [searchQuery]);
 
   const filteredGroups = searchQuery
     ? descriptor.groups.map(g => ({ ...g, configurables: filterItems(g.configurables, searchQuery) })).filter(g => g.configurables.length > 0)
@@ -754,7 +766,21 @@ export default function SettingsDialog({ onClose }: Props) {
             padding: "5px 16px", border: "1px solid var(--control-border)", borderRadius: 4,
             background: "var(--control-bg)", color: "var(--text-default)", fontSize: 12, cursor: "pointer",
           }}>Cancel</button>
-          <button onClick={onClose} style={{
+          <button onClick={() => {
+            settingsReset().catch(() => {
+              setDescriptor(FALLBACK_SETTINGS);
+              setSelectedId(null);
+              setExpandedIds(new Set());
+              setSearchQuery("");
+            });
+          }} style={{
+            padding: "5px 16px", border: "1px solid var(--control-border)", borderRadius: 4,
+            background: "var(--control-bg)", color: "var(--text-default)", fontSize: 12, cursor: "pointer",
+          }}>Reset</button>
+          <button onClick={() => {
+            settingsApply().catch(() => {});
+            onClose();
+          }} style={{
             padding: "5px 16px", border: "1px solid var(--control-border)", borderRadius: 4,
             background: "var(--control-bg)", color: "var(--text-default)", fontSize: 12, cursor: "pointer",
           }}>Apply</button>

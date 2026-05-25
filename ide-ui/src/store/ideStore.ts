@@ -50,7 +50,9 @@ export interface IdeState {
   }>;
   activeToolWindow: ToolWindowId | null;
   sidebarVisible: boolean;
+  sidebarWidth: number;
   bottomPanelVisible: boolean;
+  bottomPanelHeight: number;
   bottomPanelTab: BottomTab;
 
   openFiles: OpenFile[];
@@ -105,7 +107,9 @@ export type IdeAction =
   | { type: "TOGGLE_TOOL_WINDOW"; id: ToolWindowId }
   | { type: "SET_ACTIVE_TOOL_WINDOW"; id: ToolWindowId | null }
   | { type: "TOGGLE_SIDEBAR" }
+  | { type: "SET_SIDEBAR_WIDTH"; width: number }
   | { type: "TOGGLE_BOTTOM_PANEL" }
+  | { type: "SET_BOTTOM_PANEL_HEIGHT"; height: number }
   | { type: "SET_BOTTOM_TAB"; tab: BottomTab }
   | { type: "OPEN_FILE"; file: OpenFile }
   | { type: "CLOSE_FILE"; path: string }
@@ -143,7 +147,9 @@ export function createInitialIdeState(): IdeState {
     },
     activeToolWindow: "project",
     sidebarVisible: true,
+    sidebarWidth: 250,
     bottomPanelVisible: true,
+    bottomPanelHeight: 200,
     bottomPanelTab: "terminal",
     openFiles: [],
     activeFilePath: null,
@@ -194,8 +200,12 @@ export function ideReducer(state: IdeState, action: IdeAction): IdeState {
       return { ...state, activeToolWindow: action.id };
     case "TOGGLE_SIDEBAR":
       return { ...state, sidebarVisible: !state.sidebarVisible };
+    case "SET_SIDEBAR_WIDTH":
+      return { ...state, sidebarWidth: action.width };
     case "TOGGLE_BOTTOM_PANEL":
       return { ...state, bottomPanelVisible: !state.bottomPanelVisible };
+    case "SET_BOTTOM_PANEL_HEIGHT":
+      return { ...state, bottomPanelHeight: action.height };
     case "SET_BOTTOM_TAB":
       return { ...state, bottomPanelTab: action.tab, bottomPanelVisible: true };
     case "OPEN_FILE": {

@@ -26,7 +26,7 @@ const BOTTOM_TABS: { id: BottomTab; label: string }[] = [
 export default function BottomPanel({ bottomPanelTab, onBottomPanelTab, onHide, projectPath }: Props) {
   return (
     <div style={{
-      flex: "0 0 38%",
+      flex: 1,
       display: "flex",
       flexDirection: "column",
       minHeight: 0,
