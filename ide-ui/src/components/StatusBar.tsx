@@ -66,31 +66,7 @@ interface StatusBarDescriptor {
   memory: MemoryInfo;
 }
 
-function FALLBACK_STATUS_BAR_DESCRIPTOR(): StatusBarDescriptor {
-  const noHover: StatusBarWidgetStyle = { hover: false, font_weight: null, text_color: "var(--text-muted)", background: null, border_radius: null, icon_color: null };
-  const hoverStyle: StatusBarWidgetStyle = { hover: true, font_weight: null, text_color: "var(--text-muted)", background: null, border_radius: "4px", icon_color: null };
 
-  return {
-    info_message: "Ready",
-    progress: null,
-    memory: { used_mb: 256, max_mb: 1024, fraction: 0.25, is_high: false, enabled: true, show_text: false },
-    left_widgets: [
-      { id: "ToolWindowsWidget", position: "left", widget_type: "Icon", text: "", icon: "tool-windows", tooltip: "Tool Windows", shortcut: null, enabled: true, visible: true, order: 0, style: noHover, click_action: "showToolWindowList" },
-    ],
-    center_widgets: [
-      { id: "InfoAndProgressPanel", position: "center", widget_type: "Text", text: "Ready", icon: null, tooltip: null, shortcut: null, enabled: true, visible: true, order: 0, style: { ...noHover, text_color: "var(--text-secondary)" }, click_action: null },
-    ],
-    right_widgets: [
-      { id: "Position", position: "right", widget_type: "Text", text: "Ln 12, Col 20", icon: null, tooltip: "Cursor Position", shortcut: "Ctrl+G", enabled: true, visible: true, order: 10, style: noHover, click_action: "gotoLine" },
-      { id: "LanguageService", position: "right", widget_type: "Text", text: "Java", icon: null, tooltip: "Language Service", shortcut: null, enabled: true, visible: true, order: 20, style: { ...hoverStyle, font_weight: "500", text_color: "var(--text-default)" }, click_action: "showLanguageServices" },
-      { id: "LineSeparator", position: "right", widget_type: "Text", text: "CRLF", icon: null, tooltip: "Line Separator", shortcut: null, enabled: true, visible: true, order: 30, style: hoverStyle, click_action: "changeLineSeparator" },
-      { id: "Encoding", position: "right", widget_type: "Text", text: "UTF-8", icon: null, tooltip: "File Encoding", shortcut: null, enabled: true, visible: true, order: 40, style: hoverStyle, click_action: "changeEncoding" },
-      { id: "IndentStyle", position: "right", widget_type: "Text", text: "Spaces: 4", icon: null, tooltip: "Indentation", shortcut: null, enabled: true, visible: true, order: 45, style: hoverStyle, click_action: "changeIndentStyle" },
-      { id: "Notifications", position: "right", widget_type: "Icon", text: "", icon: "notifications", tooltip: "Notifications", shortcut: null, enabled: true, visible: true, order: 70, style: { ...hoverStyle, icon_color: "var(--text-muted)" }, click_action: "showNotifications" },
-      { id: "settingsEntryPointWidget", position: "right", widget_type: "Icon", text: "", icon: "settings", tooltip: "Settings", shortcut: "Ctrl+Alt+,", enabled: true, visible: true, order: 999, style: { ...hoverStyle, icon_color: "var(--text-muted)" }, click_action: "openSettings" },
-    ],
-  };
-}
 
 interface Props {
   theme: "dark" | "light";
@@ -215,15 +191,19 @@ function MemoryIndicator({ memory }: { memory: MemoryInfo }) {
 }
 
 export default function StatusBar({ theme, onToggleTheme, onOpenSettings }: Props) {
-  const [descriptor, setDescriptor] = useState<StatusBarDescriptor>(() => FALLBACK_STATUS_BAR_DESCRIPTOR());
+  const [descriptor, setDescriptor] = useState<StatusBarDescriptor>({
+    info_message: "",
+    progress: null,
+    memory: { used_mb: 0, max_mb: 0, fraction: 0, is_high: false, enabled: true, show_text: false },
+    left_widgets: [],
+    center_widgets: [],
+    right_widgets: [],
+  });
 
   useEffect(() => {
     getStatusBarDescriptor()
       .then((data: RustStatusBarDescriptor) => {
-        setDescriptor({ ...FALLBACK_STATUS_BAR_DESCRIPTOR(), ...data });
-      })
-      .catch(() => {
-        // fallback already set in useState initializer
+        setDescriptor(data as unknown as StatusBarDescriptor);
       });
   }, []);
 

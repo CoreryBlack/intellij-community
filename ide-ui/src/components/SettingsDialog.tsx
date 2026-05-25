@@ -78,122 +78,6 @@ interface SettingsDescriptor {
   has_errors: boolean;
 }
 
-const FALLBACK_SETTINGS: SettingsDescriptor = {
-  title: "Settings",
-  groups: [
-    {
-      id: "appearance", label: "Appearance & Behavior", description: "Customize the IDE appearance and behavior",
-      configurables: [
-        { id: "appearance", label: "Appearance", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "appearance.ui", label: "UI Options", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["theme", "font", "size"], project_level: false, beta: false, promo: false },
-          { id: "appearance.toolbar", label: "Toolbar", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["main toolbar", "navigation"], project_level: false, beta: false, promo: false },
-          { id: "appearance.statusbar", label: "Status Bar", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["status bar", "widgets"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "new.ui", label: "New UI", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "new.ui.settings", label: "New UI Settings", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["compact mode", "toolbar", "islands"], project_level: false, beta: false, promo: false },
-          { id: "new.ui.experimental", label: "Experimental Features", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["experimental", "preview"], project_level: false, beta: true, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "accessibility", label: "Accessibility", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "accessibility.settings", label: "Accessibility Settings", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["contrast", "color blindness"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "system.settings", label: "System Settings", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "system.settings.general", label: "General", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["startup", "reopen"], project_level: false, beta: false, promo: false },
-          { id: "system.settings.http.proxy", label: "HTTP Proxy", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["proxy", "http"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "notifications", label: "Notifications", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["notifications", "popup"], project_level: false, beta: false, promo: false },
-      ],
-    },
-    {
-      id: "keymap", label: "Keymap", description: "Configure keyboard shortcuts",
-      configurables: [
-        { id: "keymap.main", label: "Keymap", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["keymap", "shortcut", "keyboard"], project_level: false, beta: false, promo: false },
-      ],
-    },
-    {
-      id: "editor", label: "Editor", description: "Configure the editor",
-      configurables: [
-        { id: "editor.general", label: "General", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "editor.general.basic", label: "Basic", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["editor", "basic", "caret"], project_level: false, beta: false, promo: false },
-          { id: "editor.general.appearance", label: "Appearance", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["line numbers", "gutter", "breadcrumbs"], project_level: false, beta: false, promo: false },
-          { id: "editor.general.editor.tabs", label: "Editor Tabs", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["tab", "placement"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "editor.font", label: "Font", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "editor.font.primary", label: "Primary Font", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["font", "size", "line spacing"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "editor.color.scheme", label: "Color Scheme", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "editor.color.scheme.general", label: "Color Scheme", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["color", "scheme", "theme"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "editor.code.style", label: "Code Style", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "editor.code.style.general", label: "General", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["code style", "indent"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "editor.live.templates", label: "Live Templates", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "editor.live.templates.general", label: "General", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["live template", "snippet"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-      ],
-    },
-    {
-      id: "plugins", label: "Plugins", description: "Manage plugins",
-      configurables: [
-        { id: "plugins.marketplace", label: "Marketplace", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["plugin", "install"], project_level: false, beta: false, promo: false },
-        { id: "plugins.installed", label: "Installed", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["plugin", "manage"], project_level: false, beta: false, promo: false },
-      ],
-    },
-    {
-      id: "version.control", label: "Version Control", description: "Configure version control",
-      configurables: [
-        { id: "vcs.general", label: "General", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "vcs.git", label: "Git", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["git", "ssh", "commit"], project_level: false, beta: false, promo: false },
-          { id: "vcs.github", label: "GitHub", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["github", "pull request"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "vcs.confirmation", label: "Confirmation", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["confirmation"], project_level: false, beta: false, promo: false },
-      ],
-    },
-    {
-      id: "build.execution.deployment", label: "Build, Execution, Deployment", description: "Build and deployment settings",
-      configurables: [
-        { id: "build.tools", label: "Build Tools", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "build.gradle", label: "Gradle", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["gradle", "build"], project_level: false, beta: false, promo: false },
-          { id: "build.maven", label: "Maven", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["maven", "pom"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "build.compiler", label: "Compiler", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["compiler", "javac"], project_level: false, beta: false, promo: false },
-      ],
-    },
-    {
-      id: "languages.frameworks", label: "Languages & Frameworks", description: "Language and framework settings",
-      configurables: [
-        { id: "lang.java", label: "Java", description: null, icon: null, configurable_type: "Composite", children: [
-          { id: "lang.java.compiler", label: "Compiler", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["java", "compiler"], project_level: false, beta: false, promo: false },
-        ], modified: false, has_error: false, enabled: true, search_terms: [], project_level: false, beta: false, promo: false },
-        { id: "lang.kotlin", label: "Kotlin", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["kotlin", "compiler"], project_level: false, beta: false, promo: false },
-      ],
-    },
-    {
-      id: "tools", label: "Tools", description: "External tools and integrations",
-      configurables: [
-        { id: "tools.actions.on.save", label: "Actions on Save", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["save", "reformat"], project_level: false, beta: false, promo: false },
-        { id: "tools.terminal", label: "Terminal", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["terminal", "shell"], project_level: false, beta: false, promo: false },
-        { id: "tools.diff", label: "Diff", description: null, icon: null, configurable_type: "Searchable", children: [], modified: false, has_error: false, enabled: true, search_terms: ["diff", "compare"], project_level: false, beta: false, promo: false },
-      ],
-    },
-  ],
-  editor_state: {
-    current_configurable_id: null,
-    modified_ids: [],
-    error_ids: [],
-    search_query: "",
-    breadcrumbs: [],
-    can_navigate_back: false,
-    can_navigate_forward: false,
-  },
-  dialog_width: 900,
-  dialog_height: 700,
-  splitter_ratio: 0.2,
-  show_apply_button: false,
-  show_reset_button: false,
-  is_modified: false,
-  has_errors: false,
-};
-
 interface Props {
   onClose: () => void;
 }
@@ -560,16 +444,35 @@ function filterItems(items: ConfigurableItem[], query: string): ConfigurableItem
 }
 
 export default function SettingsDialog({ onClose }: Props) {
-  const [descriptor, setDescriptor] = useState<SettingsDescriptor>(() => FALLBACK_SETTINGS);
+  const [descriptor, setDescriptor] = useState<SettingsDescriptor>({
+    title: "Settings",
+    groups: [],
+    editor_state: {
+      current_configurable_id: null,
+      modified_ids: [],
+      error_ids: [],
+      search_query: "",
+      breadcrumbs: [],
+      can_navigate_back: false,
+      can_navigate_forward: false,
+    },
+    dialog_width: 900,
+    dialog_height: 700,
+    splitter_ratio: 0.2,
+    show_apply_button: true,
+    show_reset_button: true,
+    is_modified: false,
+    has_errors: false,
+  });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    getSettingsDescriptor()
-      .then(data => setDescriptor(data))
-      .catch(() => {});
+    getSettingsDescriptor().then((data) => {
+      setDescriptor(data as unknown as SettingsDescriptor);
+    });
   }, []);
 
   useEffect(() => {
@@ -584,9 +487,9 @@ export default function SettingsDialog({ onClose }: Props) {
     searchRef.current?.focus();
   }, []);
 
-  const handleSelect = useCallback((id: string) => {
+  const handleSelect = useCallback(async (id: string) => {
+    await settingsSelectConfigurable(id);
     setSelectedId(id);
-    settingsSelectConfigurable(id).catch(() => {});
   }, []);
 
   const handleToggle = useCallback((id: string) => {
@@ -599,7 +502,7 @@ export default function SettingsDialog({ onClose }: Props) {
   }, []);
 
   useEffect(() => {
-    settingsSearch(searchQuery).catch(() => {});
+    settingsSearch(searchQuery);
   }, [searchQuery]);
 
   const filteredGroups = searchQuery
@@ -766,19 +669,14 @@ export default function SettingsDialog({ onClose }: Props) {
             padding: "5px 16px", border: "1px solid var(--control-border)", borderRadius: 4,
             background: "var(--control-bg)", color: "var(--text-default)", fontSize: 12, cursor: "pointer",
           }}>Cancel</button>
-          <button onClick={() => {
-            settingsReset().catch(() => {
-              setDescriptor(FALLBACK_SETTINGS);
-              setSelectedId(null);
-              setExpandedIds(new Set());
-              setSearchQuery("");
-            });
+          <button onClick={async () => {
+            await settingsReset();
           }} style={{
             padding: "5px 16px", border: "1px solid var(--control-border)", borderRadius: 4,
             background: "var(--control-bg)", color: "var(--text-default)", fontSize: 12, cursor: "pointer",
           }}>Reset</button>
-          <button onClick={() => {
-            settingsApply().catch(() => {});
+          <button onClick={async () => {
+            await settingsApply();
             onClose();
           }} style={{
             padding: "5px 16px", border: "1px solid var(--control-border)", borderRadius: 4,

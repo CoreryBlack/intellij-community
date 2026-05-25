@@ -75,44 +75,7 @@ interface WelcomeScreenDescriptor {
   project_preview: ProjectPreview | null;
 }
 
-/* ── FALLBACK data (identical to Rust welcome.rs default) ── */
 
-const FALLBACK_WELCOME: WelcomeScreenDescriptor = {
-  product_name: "IntelliJ IDEA",
-  version: "2025.1",
-  product_icon: "intellij-idea",
-  build_number: "251.0",
-  tabs: [
-    { id: "projects", label: "Projects", icon: "folder", selected: true },
-    { id: "plugins", label: "Plugins", icon: "plugin", selected: false },
-    { id: "learn", label: "Learn", icon: "learn", selected: false },
-  ],
-  active_tab_id: "projects",
-  quick_actions: [
-    { id: "NewProject", label: "New Project", icon: "new-project", description: "Create a new project from scratch", enabled: true },
-    { id: "Open", label: "Open", icon: "open", description: "Open an existing project", enabled: true },
-    { id: "GetFromVCS", label: "Get from VCS", icon: "vcs", description: "Clone a repository from version control", enabled: true },
-  ],
-  recent_projects: [
-    { name: "AstralLight", path: "E:/Projects/AstralLight", icon: "project", timestamp: "Just now", valid: true },
-    { name: "intellij-community", path: "E:/OfficialVersion/intellij-community", icon: "project", timestamp: "2 min ago", valid: true },
-    { name: "ide-ui", path: "E:/OfficialVersion/intellij-community/ide-ui", icon: "project", timestamp: "Yesterday", valid: true },
-    { name: "rust-toolkit", path: "E:/Projects/rust-toolkit", icon: "project", timestamp: "3 days ago", valid: true },
-  ],
-  project_groups: [],
-  speed_search: { enabled: true, query: "", selected_index: -1 },
-  configure_actions: [
-    { id: "settings", label: "Settings", icon: "settings", description: null, enabled: true },
-    { id: "plugins", label: "Plugins", icon: "plugin", description: null, enabled: true },
-    { id: "help", label: "Help", icon: "help", description: null, enabled: true },
-  ],
-  footer_actions: [
-    { id: "toggle_theme", label: "Light", icon: "theme", description: null, enabled: true },
-    { id: "settings", label: "Settings", icon: "settings", description: null, enabled: true },
-    { id: "about", label: "About", icon: "about", description: null, enabled: true },
-  ],
-  project_preview: null,
-};
 
 /* ── ActionIcon — purely mechanical icon renderer ── */
 
@@ -146,25 +109,28 @@ interface Props {
   _theme?: "dark" | "light";
 }
 
-export default function WelcomeScreen({ onOpenProject, onNewProject, onToggleTheme }: Props) {
-  const [welcome, setWelcome] = useState<WelcomeScreenDescriptor>(FALLBACK_WELCOME);
+export default function WelcomeScreen({ onOpenProject: _onOpenProject, onNewProject, onToggleTheme }: Props) {
+  const [welcome, setWelcome] = useState<WelcomeScreenDescriptor>({
+    product_name: "",
+    version: "",
+    product_icon: "",
+    build_number: "",
+    tabs: [],
+    active_tab_id: "",
+    quick_actions: [],
+    recent_projects: [],
+    project_groups: [],
+    speed_search: { enabled: false, query: "", selected_index: -1 },
+    configure_actions: [],
+    footer_actions: [],
+    project_preview: null,
+  });
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    (async () => {
-      try {
-        const data: RustWelcomeDescriptor = await getWelcomeScreen();
-        setWelcome(prev => ({
-          ...prev,
-          ...data,
-          project_groups: prev.project_groups,
-          speed_search: prev.speed_search,
-          project_preview: prev.project_preview,
-        }));
-      } catch {
-        // fallback to FALLBACK_WELCOME (already set as initial state)
-      }
-    })();
+    getWelcomeScreen().then((data: RustWelcomeDescriptor) => {
+      setWelcome(data as unknown as WelcomeScreenDescriptor);
+    });
   }, []);
 
   const handleQuickAction = (action: QuickAction) => {
@@ -176,21 +142,13 @@ export default function WelcomeScreen({ onOpenProject, onNewProject, onToggleThe
   };
 
   const handleTabClick = (tabId: string) => {
-    try {
-      welcomeSetActiveTab(tabId);
-    } catch {
-      // fallback to local state update
-    }
+    welcomeSetActiveTab(tabId);
     const tabs = welcome.tabs.map(t => ({ ...t, selected: t.id === tabId }));
     setWelcome(prev => ({ ...prev, active_tab_id: tabId, tabs }));
   };
 
   const handleOpenProject = (path: string) => {
-    try {
-      openProject(path);
-    } catch {
-      onOpenProject(path);
-    }
+    openProject(path);
   };
 
   /* ── Speed search filtering (port of RecentProjectPanel ListWithFilter) ── */

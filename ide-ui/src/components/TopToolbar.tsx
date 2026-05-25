@@ -11,9 +11,6 @@
  *   2. Forwards user interactions to Rust via invoke()
  *   3. Mechanically applies the Rust-computed render output
  *
- * In browser dev mode (no Tauri invoke), uses FALLBACK state simulation
- * that exactly mirrors the Rust backend's logic.
- *
  * Official pipeline (fully ported to Rust):
  *   ActionButton.paintComponent(g)
  *   → paintButtonLook(g)
@@ -31,7 +28,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import ToolbarDropdown, { type MenuItem } from "./ToolbarDropdown";
-import { getToolbarDescriptor, toolbarEvent, toolbarClick, type ToolbarDescriptor as RustToolbarDescriptor, type ToolbarEventResult as RustToolbarEventResult } from "../services/ideService";
+import { getToolbarDescriptor, toolbarEvent, toolbarClick, getMainMenu, type ToolbarDescriptor as RustToolbarDescriptor } from "../services/ideService";
 
 /* ═══════════════════════════════════════════
  * RUST BACKEND TYPES — exact mirror of
@@ -133,412 +130,18 @@ interface ToolbarDescriptor {
   width_distribution: ToolbarWidthInfo[] | null;
 }
 
-interface ToolbarEventResult {
-  button: ToolbarButtonDesc;
-  action: string | null;
-}
 
-/* ═══════════════════════════════════════════
- * FALLBACK RUST STATE MACHINE — pure TS port
- * of frontend.rs::ToolbarFrontend
- *
- * In production (Tauri), the REAL Rust backend
- * handles state. In dev browser mode, this
- * fallback exactly mirrors the Rust logic.
- * ═══════════════════════════════════════════ */
 
-interface ButtonClientState {
-  rollover: boolean;
-  mouse_down: boolean;
-  focused: boolean;
-}
-
-function newClientState(): ButtonClientState {
-  return { rollover: false, mouse_down: false, focused: false };
-}
-
-/** @see frontend.rs::ButtonClientState methods — exact port */
-function handleClientEvent(state: ButtonClientState, eventType: string): { state: ButtonClientState; shouldPerformAction: boolean } {
-  const s = { ...state };
-  let shouldPerformAction = false;
-  switch (eventType) {
-    case "mouse_enter": s.rollover = true; break;
-    case "mouse_leave": s.rollover = false; s.mouse_down = false; break;
-    case "mouse_down": s.mouse_down = true; s.rollover = true; break;
-    case "mouse_up": shouldPerformAction = s.rollover; s.mouse_down = false; break;
-    case "focus": s.focused = true; break;
-    case "blur": s.focused = false; break;
-  }
-  return { state: s, shouldPerformAction };
-}
-
-/** @see button_look.rs::compute_pop_state — exact port */
-function computePopState(rollover: boolean, mouseDown: boolean, isPushed: boolean, isFocusOwner: boolean, isEnabled: boolean): ButtonStateStr {
-  if (isPushed || (rollover && mouseDown && isEnabled)) return "Pushed";
-  if (rollover && isEnabled) return "Popped";
-  if (isFocusOwner) return "Selected";
-  return "Normal";
-}
-
-/** @see button_look.rs::get_header_background_color — exact port */
-function getHeaderBgColor(enabled: boolean, state: ButtonStateStr): string | null {
-  if (!enabled) return null;
-  if (state === "Pushed") return "var(--toolbar-bg-pressed)";
-  if (state === "Popped") return "var(--toolbar-bg-hovered)";
-  return null;
-}
-
-/** @see button_look.rs::compute_icon_position — exact port */
-function computeIconPos(w: number, h: number, iconSize: number, compInsets: Insets, iconInsets: Insets): { x: number; y: number } {
-  let rx = compInsets.left + iconInsets.left;
-  let ry = compInsets.top + iconInsets.top;
-  let rw = w - compInsets.left - compInsets.right - iconInsets.left - iconInsets.right;
-  let rh = h - compInsets.top - compInsets.bottom - iconInsets.top - iconInsets.bottom;
-  return {
-    x: Math.max(0, Math.round(rx + (rw - iconSize) / 2)),
-    y: Math.max(0, Math.round(ry + (rh - iconSize) / 2)),
-  };
-}
-
-/** @see button_look.rs::compute_arrow_position — exact port */
-function computeArrowPos(iconPos: { x: number; y: number }, iconSize: number): { x: number; y: number } {
-  return {
-    x: Math.max(0, iconPos.x + 1 + (iconSize - 7)),
-    y: Math.max(0, iconPos.y + 1 + (iconSize - 4)),
-  };
-}
-
-/** @see frontend.rs::ToolbarFrontend.compute_updated_button — exact port */
-function computeButtonRender(
-  btn: ToolbarButtonDesc,
-  clientState: ButtonClientState,
-): ToolbarButtonDesc {
-  const { presentation, look_params } = btn;
-  const state = computePopState(
-    clientState.rollover, clientState.mouse_down,
-    presentation.toggle_state ?? false, clientState.focused,
-    presentation.enabled,
-  );
-
-  const bgColor = getHeaderBgColor(presentation.enabled, state);
-  const iconPos = computeIconPos(
-    btn.current_width, btn.current_height,
-    look_params.icon_size, look_params.component_insets, look_params.icon_insets,
-  );
-  const showArrow = presentation.popup_group && !presentation.hide_dropdown_icon;
-  const arrowPos = showArrow ? computeArrowPos(iconPos, look_params.icon_size) : { x: 0, y: 0 };
-
-  return {
-    ...btn,
-    state,
-    focused: clientState.focused,
-    render_output: {
-      look_kind: look_params.kind,
-      paint_background: bgColor !== null,
-      background_color: bgColor,
-      background_arc: look_params.background_arc,
-      paint_border: clientState.focused && look_params.focus_only_border,
-      border_color: clientState.focused ? look_params.focus_border_color : null,
-      border_width: look_params.focus_border_width,
-      border_arc: look_params.button_arc,
-      icon_size: look_params.icon_size,
-      icon_x: iconPos.x,
-      icon_y: iconPos.y,
-      show_down_arrow: showArrow,
-      arrow_x: arrowPos.x,
-      arrow_y: arrowPos.y,
-      preferred_size: { ...look_params.minimum_button_size },
-      minimum_size: { ...look_params.minimum_button_size },
-      insets: { ...look_params.component_insets },
-      icon_insets: { ...look_params.icon_insets },
-    },
-  };
-}
-
-/** @see frontend.rs::ToolbarFrontend.determine_action — exact port */
-function determineAction(btn: ToolbarButtonDesc): string | null {
-  if (btn.presentation.popup_group) return "show_menu";
-  if (btn.presentation.id === "MainMenuButton") return "show_main_menu";
-  return "click";
-}
-
-/* ═══════════════════════════════════════════
- * FALLBACK DATA (identical to Rust backend output)
- * ═══════════════════════════════════════════ */
-
-function makeLook(isBurger?: boolean): ButtonLookParams {
-  return {
-    kind: "HeaderToolbar",
-    button_arc: 8,
-    icon_size: 18,
-    minimum_button_size: { width: 26, height: 26 },
-    preferred_button_size: { width: 26, height: 26 },
-    suppress_border: true,
-    focus_only_border: true,
-    focus_border_width: 2,
-    focus_border_color: "var(--ide-focus-color)",
-    background_arc: 8,
-    disable_filter: "lightThemeDarkHeader",
-    icon_insets: isBurger ? { top: 4, left: 5, bottom: 4, right: 5 } : { top: 4, left: 4, bottom: 4, right: 4 },
-    component_insets: { top: 0, left: 0, bottom: 0, right: 0 },
-  };
-}
-
-function makeBtn(id: string, text: string, icon: string, kind: ActionKind, popup: boolean, tooltip: string | null, shortcut: string | null, enabled: boolean, badge: string | null, isBurger?: boolean): ToolbarButtonDesc {
-  const look = makeLook(isBurger);
-  const presentation: ActionPresentation = {
-    id, text, description: tooltip, icon,
-    action_kind: kind, shortcut, tooltip,
-    enabled, visible: true, popup_group: popup,
-    hide_dropdown_icon: false, toggle_state: null, badge,
-  };
-  const iconPos = computeIconPos(look.minimum_button_size.width, look.minimum_button_size.height, look.icon_size, look.component_insets, look.icon_insets);
-  const showArrow = popup;
-  const arrowPos = showArrow ? computeArrowPos(iconPos, look.icon_size) : { x: 0, y: 0 };
-  return {
-    presentation, look_params: look,
-    state: "Normal", focused: false,
-    current_width: look.minimum_button_size.width,
-    current_height: look.minimum_button_size.height,
-    render_output: {
-      look_kind: look.kind, paint_background: false, background_color: null,
-      background_arc: look.background_arc,
-      paint_border: false, border_color: null, border_width: look.focus_border_width, border_arc: look.button_arc,
-      icon_size: look.icon_size, icon_x: iconPos.x, icon_y: iconPos.y,
-      show_down_arrow: showArrow, arrow_x: arrowPos.x, arrow_y: arrowPos.y,
-      preferred_size: { ...look.minimum_button_size }, minimum_size: { ...look.minimum_button_size },
-      insets: { ...look.component_insets }, icon_insets: { ...look.icon_insets },
-    },
-  };
-}
-
-function makeSep(): ToolbarButtonDesc {
-  return {
-    presentation: { id: "Separator", text: "", description: null, icon: "", action_kind: "Separator", shortcut: null, tooltip: null, enabled: false, visible: true, popup_group: false, hide_dropdown_icon: false, toggle_state: null, badge: null },
-    look_params: makeLook(), state: "Normal", focused: false, current_width: 1, current_height: 18,
-    render_output: {
-      look_kind: "HeaderToolbar", paint_background: false, background_color: null, background_arc: 12,
-      paint_border: false, border_color: null, border_width: 2, border_arc: 12,
-      icon_size: 20, icon_x: 0, icon_y: 0, show_down_arrow: false, arrow_x: 0, arrow_y: 0,
-      preferred_size: { width: 1, height: 18 }, minimum_size: { width: 1, height: 18 },
-      insets: { top: 0, left: 0, bottom: 0, right: 0 }, icon_insets: { top: 0, left: 0, bottom: 0, right: 0 },
-    },
-  };
-}
-
-function FALLBACK_TOOLBAR_DESCRIPTOR(projectName: string): ToolbarDescriptor {
-  return {
-    layout_gap: 10,
-    project: { name: projectName, path: "", icon: "project", color: "#3871E1" },
-    run_configurations: [{ id: "spring-boot", name: "AstralMonitorApplication", type_name: "Spring Boot", icon: "spring", pinned: true }],
-    active_run_config: "spring-boot",
-    git: { branch: "main", remote: "origin", clean: true, ahead: 0, behind: 0, has_changes: false },
-    active_file_name: null,
-    groups: [
-      { id: "MainToolbarLeft", position: "Left", buttons: [
-        makeBtn("MainMenuButton", "Main Menu", "hamburger", "Button", false, "Main Menu", null, true, null, true),
-        makeBtn("main.toolbar.Project", projectName, "project", "Dropdown", true, "Recent Projects", null, true, null),
-        makeBtn("main.toolbar.git.Branches", "main", "git-branch", "Dropdown", true, "Git Branches", null, true, null),
-        makeBtn("CheckinProject", "Commit", "commit", "Button", false, "Commit (Ctrl+K)", "Ctrl+K", true, null),
-        makeBtn("Vcs.Push", "Push", "push", "Button", false, "Push (Ctrl+Shift+K)", "Ctrl+Shift+K", true, null),
-        makeSep(),
-      ]},
-      { id: "MainToolbarCenter", position: "Center", buttons: [
-        makeBtn("SearchEverywhere", "Search", "search", "Button", false, "Search Everywhere (Double Shift)", "Double Shift", true, null),
-      ]},
-      { id: "MainToolbarRight", position: "Right", buttons: [
-        makeBtn("NewUiRunWidget", "AstralMonitorApplication", "run", "Dropdown", true, "Run Configuration", null, true, null),
-        makeBtn("Run", "Run", "run", "Button", false, "Run (Shift+F10)", "Shift+F10", true, null),
-        makeBtn("Debug", "Debug", "debug", "Button", false, "Debug (Shift+F9)", "Shift+F9", true, null),
-        makeSep(),
-        makeBtn("SearchEverywhere.Right", "Search", "search", "Button", false, "Search Everywhere (Double Shift)", "Double Shift", true, null),
-        makeBtn("SettingsEntryPoint", "Settings", "settings", "Button", false, "Settings (Ctrl+Alt+,)", "Ctrl+Alt+,", true, null),
-      ]},
-    ],
-    width_distribution: null,
-  };
-}
-
-/* ═══════════════════════════════════════════
- * FALLBACK main menu data
- * ═══════════════════════════════════════════ */
-
-function M(label: string, id: string, shortcut?: string, action?: string, children?: MenuItem[], opts?: { disabled?: boolean; toggle?: boolean; checked?: boolean }): MenuItem {
-  return {
-    id, label, item_type: children ? "Submenu" : "Action", icon: null, shortcut: shortcut || null,
-    enabled: !opts?.disabled, visible: true, checked: opts?.checked ? true : null, toggle: opts?.toggle || false,
-    children: children || [], click_action: action || null,
-  };
-}
-function SEP(): MenuItem { return { id: "", label: "", item_type: "Separator", icon: null, shortcut: null, enabled: false, visible: true, checked: null, toggle: false, children: [], click_action: null }; }
-
-function FALLBACK_MAIN_MENU(): MenuItem[] {
-  return [
-    M("File", "FileMenu", undefined, undefined, [
-      M("Open...", "OpenFile", undefined, "open_file"), M("Attach Project...", "AttachProject"), SEP(),
-      M("Close Project", "CloseProject", undefined, "back_to_welcome"), SEP(),
-      M("File Properties", "FilePropertiesGroup", undefined, undefined, [
-        M("File Encoding...", "FileEncoding"), M("Associate with File Type...", "AssociateFileType"),
-        M("Toggle Read-Only", "ToggleReadOnly", undefined, undefined, undefined, { toggle: true }), SEP(),
-        M("Line Separators", "LineSeparatorsGroup", undefined, undefined, [
-          M("CRLF - Windows (\\r\\n)", "line_sep.crlf", undefined, undefined, undefined, { toggle: true }),
-          M("LF - Unix / macOS (\\n)", "line_sep.lf", undefined, undefined, undefined, { toggle: true }),
-          M("CR - Classic Mac (\\r)", "line_sep.cr", undefined, undefined, undefined, { toggle: true }),
-        ]),
-      ]),
-      SEP(), M("Save All", "SaveAll", "Ctrl+S"), M("Reload from Disk", "Synchronize"),
-      M("Invalidate Caches...", "InvalidateCaches"), SEP(),
-      M("Manage IDE Settings", "ExportImportGroup", undefined, undefined, [
-        M("Import Settings...", "ImportSettings"), M("Export Settings...", "ExportSettings"),
-        M("Restore Default Settings...", "RestoreDefaultSettings"),
-      ]), SEP(),
-      M("Power Save Mode", "TogglePowerSave", undefined, undefined, undefined, { toggle: true }), SEP(),
-      M("Exit", "Exit"),
-    ]),
-    M("Edit", "EditMenu", undefined, undefined, [
-      M("Undo", "Undo", "Ctrl+Z"), M("Redo", "Redo", "Ctrl+Shift+Z"), SEP(),
-      M("Cut", "Cut", "Ctrl+X"), M("Copy", "Copy", "Ctrl+C"), M("Copy Path", "CopyPath", "Ctrl+Shift+C"),
-      M("Paste", "PasteGroup", "Ctrl+V", undefined, [M("Paste as Plain Text", "PasteSimple", "Ctrl+Shift+V")]),
-      M("Delete", "Delete", "Delete"), SEP(),
-      M("Find", "FindMenuGroup", undefined, undefined, [
-        M("Find...", "Find", "Ctrl+F"), M("Replace...", "Replace", "Ctrl+R"),
-        M("Find Next", "FindNext", "F3"), M("Find Previous", "FindPrevious", "Shift+F3"), SEP(),
-        M("Find in Files...", "FindInFiles", "Ctrl+Shift+F"), M("Replace in Files...", "ReplaceInFiles", "Ctrl+Shift+R"),
-      ]), SEP(),
-      M("Column Selection Mode", "ColumnSelectionMode", "Shift+Alt+Insert", undefined, undefined, { toggle: true }),
-      M("Select All", "SelectAll", "Ctrl+A"), SEP(),
-      M("Toggle Case", "ToggleCase", "Ctrl+Shift+U"), M("Join Lines", "JoinLines", "Ctrl+Shift+J"),
-      M("Duplicate Line", "DuplicateLines", "Ctrl+D"), SEP(),
-      M("Convert Indents", "ConvertIndents"), M("Macros", "Macros"),
-    ]),
-    M("View", "ViewMenu", undefined, undefined, [
-      M("Tool Windows", "ToolWindowsGroup", undefined, undefined, [
-        M("Project", "ActivateProjectToolWindow", "Alt+1"), M("Commit", "ActivateCommitToolWindow", "Alt+0"),
-        M("Terminal", "ActivateTerminalToolWindow", "Alt+F12"), M("Run", "ActivateRunToolWindow", "Alt+4"),
-        M("Problems", "ActivateProblemsViewToolWindow"), M("Structure", "ActivateStructureToolWindow", "Alt+7"),
-      ]),
-      M("Appearance", "ViewAppearanceGroup", undefined, undefined, [
-        M("Full Screen", "ToggleFullScreen", undefined, undefined, undefined, { toggle: true }),
-        M("Presentation Mode", "TogglePresentationMode", undefined, undefined, undefined, { toggle: true }), SEP(),
-        M("Main Menu", "ViewMainMenu", undefined, undefined, undefined, { toggle: true, checked: true }),
-        M("Toolbar", "ViewToolbar", undefined, undefined, undefined, { toggle: true, checked: true }),
-        M("Status Bar", "ViewStatusBar", undefined, undefined, undefined, { toggle: true, checked: true }),
-      ]), SEP(),
-      M("Recent Files", "RecentFiles", "Ctrl+E"), M("Recent Locations", "RecentLocations", "Ctrl+Shift+E"), SEP(),
-      M("Quick Switch Scheme...", "QuickSwitchScheme"),
-      M("Active Editor", "EditorToggleActions", undefined, undefined, [
-        M("Show Line Numbers", "ToggleLineNumbers", undefined, undefined, undefined, { toggle: true, checked: true }),
-        M("Show Breadcrumbs", "ToggleBreadcrumb", undefined, undefined, undefined, { toggle: true }),
-        M("Show Gutter Icons", "ToggleGutterIcons", undefined, undefined, undefined, { toggle: true, checked: true }),
-        M("Show Indent Guides", "ToggleIndentGuides", undefined, undefined, undefined, { toggle: true }),
-      ]),
-    ]),
-    M("Navigate", "GoToMenu", undefined, undefined, [
-      M("Back", "Back", "Ctrl+Alt+Left"), M("Forward", "Forward", "Ctrl+Alt+Right"), SEP(),
-      M("Search Everywhere", "SearchEverywhere", "Double Shift", "search_everywhere"), SEP(),
-      M("File...", "GotoFile", "Ctrl+Shift+N"), M("Class...", "GotoClass", "Ctrl+N"),
-      M("Line/Column...", "GotoLine", "Ctrl+G"), M("Declaration / Usages", "GotoDeclaration", "Ctrl+B"),
-      M("Implementation(s)", "GotoImplementation", "Ctrl+Alt+B"), SEP(),
-      M("Next Highlighted Error", "GotoNextError", "F2"), M("Previous Highlighted Error", "GotoPreviousError", "Shift+F2"),
-      M("Last Edit Location", "LastEditLocation", "Ctrl+Shift+Backspace"),
-    ]),
-    M("Code", "CodeMenu", undefined, undefined, [
-      M("Override Methods...", "OverrideMethods", "Ctrl+O"), M("Implement Methods...", "ImplementMethods", "Ctrl+I"),
-      M("Generate...", "Generate", "Alt+Insert"), SEP(),
-      M("Code Completion", "CodeCompletionGroup", undefined, undefined, [
-        M("Basic", "CodeCompletion", "Ctrl+Space"), M("SmartType", "SmartTypeCompletion", "Ctrl+Shift+Space"),
-      ]), SEP(),
-      M("Insert Live Template...", "InsertLiveTemplate", "Ctrl+J"), M("Surround With...", "SurroundWith", "Ctrl+Alt+T"), SEP(),
-      M("Folding", "CodeFoldingGroup", undefined, undefined, [
-        M("Collapse", "CollapseRegion", "Ctrl+-"), M("Expand", "ExpandRegion", "Ctrl++"),
-        M("Collapse All", "CollapseAll", "Ctrl+Shift+-"), M("Expand All", "ExpandAll", "Ctrl+Shift++"),
-      ]), SEP(),
-      M("Comment with Line Comment", "CommentByLineComment", "Ctrl+/"), M("Comment with Block Comment", "CommentByBlockComment", "Ctrl+Shift+/"), SEP(),
-      M("Reformat Code", "ReformatCode", "Ctrl+Alt+L"), M("Optimize Imports", "OptimizeImports", "Ctrl+Alt+O"),
-      M("Move Line Up", "MoveLineUp", "Shift+Alt+Up"), M("Move Line Down", "MoveLineDown", "Shift+Alt+Down"),
-    ]),
-    M("Refactor", "RefactoringMenu", undefined, undefined, [
-      M("Refactor This...", "Refactorings.QuickListPopupAction", "Ctrl+Alt+Shift+T"), SEP(),
-      M("Rename...", "RenameElement", "Shift+F6"), M("Change Signature...", "ChangeSignature", "Ctrl+F6"), SEP(),
-      M("Extract / Introduce", "IntroduceActionsGroup", undefined, undefined, [
-        M("Variable...", "IntroduceVariable", "Ctrl+Alt+V"), M("Constant...", "IntroduceConstant", "Ctrl+Alt+C"),
-        M("Field...", "IntroduceField", "Ctrl+Alt+F"), M("Parameter...", "IntroduceParameter", "Ctrl+Alt+P"),
-        M("Method...", "ExtractMethod", "Ctrl+Alt+M"),
-      ]),
-      M("Inline...", "Inline", "Ctrl+Alt+N"), SEP(),
-      M("Move...", "Move", "F6"), M("Copy...", "CopyClass", "F5"), M("Safe Delete...", "SafeDelete", "Alt+Delete"),
-    ]),
-    M("Build", "BuildMenu", undefined, undefined, [
-      M("Build Project", "CompileDirty", "Ctrl+F9"), M("Compile File", "Compile", "Ctrl+Shift+F9"), SEP(),
-      M("Recompile Files", "RecompileWithAllWarnings"),
-    ]),
-    M("Run", "RunMenu", undefined, undefined, [
-      M("Run", "Run", "Shift+F10"), M("Debug", "Debug", "Shift+F9"), SEP(),
-      M("Run...", "RunClass", "Ctrl+Shift+F10"), M("Debug...", "DebugClass"), SEP(),
-      M("Stop", "Stop", "Ctrl+F2"), M("Rerun", "Rerun"), SEP(),
-      M("Edit Configurations...", "EditRunConfigurations"),
-    ]),
-    M("Tools", "ToolsMenu", undefined, undefined, [
-      M("Create Command-line Launcher...", "CreateCommandLineLauncher"), M("Create Desktop Entry...", "CreateDesktopEntry"), SEP(),
-      M("Terminal", "Terminal"),
-    ]),
-    M("Git", "VcsGroups", undefined, undefined, [
-      M("VCS Operations Popup...", "Vcs.QuickListPopupAction", "Alt+`"), SEP(),
-      M("Commit...", "CheckinProject", "Ctrl+K"), M("Update Project", "Vcs.UpdateProject", "Ctrl+T"),
-      M("Push...", "Vcs.Push", "Ctrl+Shift+K"), SEP(),
-      M("Branches...", "Vcs.Branches"), M("Shelve Changes...", "ShelveChanges"), M("Create Patch...", "CreatePatch"),
-      M("Apply Patch...", "ApplyPatch"),
-    ]),
-    M("Window", "WindowMenu", undefined, undefined, [
-      M("Active Tool Window", "ActiveToolWindowGroup", undefined, undefined, [
-        M("Hide", "HideActiveWindow", "Ctrl+Shift+F12"), M("Maximize", "MaximizeToolWindow"),
-      ]),
-      M("Editor Tabs", "EditorTabsGroup", undefined, undefined, [
-        M("Close", "CloseEditor", "Ctrl+F4"), M("Close All", "CloseAllEditors"),
-        M("Split Right", "SplitVertically"), M("Split Down", "SplitHorizontally"),
-      ]), SEP(),
-      M("Store Current Layout as Default", "StoreDefaultLayout"), M("Restore Default Layout", "RestoreDefaultLayout"),
-    ]),
-    M("Help", "HelpMenu", undefined, undefined, [
-      M("Find Action...", "GotoAction", "Ctrl+Shift+A", "search_everywhere"), SEP(),
-      M("Help Topics...", "HelpTopics"), SEP(), M("Check for Updates...", "CheckForUpdate"), SEP(),
-      M("About", "About"),
-    ]),
-  ];
-}
-
-/* ═══════════════════════════════════════════
- * FALLBACK EVENT HANDLER — pure TS port of
- * frontend.rs::ToolbarFrontend.handle_event
- * ═══════════════════════════════════════════ */
-
-const fallbackClientStates = new Map<string, ButtonClientState>();
-
-function fallbackHandleEvent(
-  descriptor: ToolbarDescriptor,
-  id: string,
-  eventType: string,
-): ToolbarEventResult | null {
-  let client = fallbackClientStates.get(id);
-  if (!client) { client = newClientState(); fallbackClientStates.set(id, client); }
-
-  const { state: updatedClient, shouldPerformAction } = handleClientEvent(client, eventType);
-  fallbackClientStates.set(id, updatedClient);
-
-  for (const group of descriptor.groups) {
-    for (const btn of group.buttons) {
-      if (btn.presentation.id === id) {
-        const updatedButton = computeButtonRender(btn, updatedClient);
-        let action: string | null = null;
-        if (shouldPerformAction) {
-          action = determineAction(btn);
-        }
-        return { button: updatedButton, action };
-      }
-    }
-  }
-  return null;
-}
+const EMPTY_DESCRIPTOR: ToolbarDescriptor = {
+  layout_gap: 0,
+  groups: [],
+  project: { name: "", path: "", icon: "", color: null },
+  run_configurations: [],
+  active_run_config: null,
+  git: null,
+  active_file_name: null,
+  width_distribution: null,
+};
 
 /* ═══════════════════════════════════════════
  * ActionIcon — purely mechanical SVG renderer
@@ -580,7 +183,7 @@ function ToolbarButton({
   onEvent,
 }: {
   button: ToolbarButtonDesc;
-  onEvent: (eventType: string, result: ToolbarEventResult) => void;
+  onEvent: (eventType: string) => void;
 }) {
   const { presentation, look_params, render_output } = button;
   const isDropdown = presentation.action_kind === "Dropdown" || render_output.show_down_arrow;
@@ -600,15 +203,15 @@ function ToolbarButton({
   return (
     <button
       title={presentation.tooltip || presentation.text}
-      onMouseEnter={() => onEvent("mouse_enter", null as any)}
-      onMouseLeave={() => onEvent("mouse_leave", null as any)}
-      onMouseDown={() => onEvent("mouse_down", null as any)}
+      onMouseEnter={() => onEvent("mouse_enter")}
+      onMouseLeave={() => onEvent("mouse_leave")}
+      onMouseDown={() => onEvent("mouse_down")}
       onMouseUp={(e) => {
         e.preventDefault();
-        onEvent("mouse_up", null as any);
+        onEvent("mouse_up");
       }}
-      onFocus={() => onEvent("focus", null as any)}
-      onBlur={() => onEvent("blur", null as any)}
+      onFocus={() => onEvent("focus")}
+      onBlur={() => onEvent("blur")}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -658,8 +261,9 @@ interface Props {
 }
 
 export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme, onSearchEverywhere, onOpenSettings }: Props) {
-  const [descriptor, setDescriptor] = useState<ToolbarDescriptor>(() => FALLBACK_TOOLBAR_DESCRIPTOR(projectName));
+  const [descriptor, setDescriptor] = useState<ToolbarDescriptor>(EMPTY_DESCRIPTOR);
   const [buttonMap, setButtonMap] = useState<Map<string, ToolbarButtonDesc>>(new Map());
+  const [mainMenu, setMainMenu] = useState<MenuItem[]>([]);
   const [dropdownState, setDropdownState] = useState<{
     triggerId: string;
     triggerRect: DOMRect;
@@ -668,107 +272,72 @@ export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme
 
   useEffect(() => {
     (async () => {
-      let d: ToolbarDescriptor;
-      try {
-        const rustDescriptor: RustToolbarDescriptor = await getToolbarDescriptor();
-        d = rustDescriptor as unknown as ToolbarDescriptor;
-      } catch {
-        d = FALLBACK_TOOLBAR_DESCRIPTOR(projectName);
-      }
-      setDescriptor(d);
+      const rustDescriptor: RustToolbarDescriptor = await getToolbarDescriptor();
+      setDescriptor(rustDescriptor as unknown as ToolbarDescriptor);
       const m = new Map<string, ToolbarButtonDesc>();
-      for (const g of d.groups) {
+      for (const g of rustDescriptor.groups) {
         for (const b of g.buttons) {
-          m.set(b.presentation.id, b);
+          m.set(b.presentation.id, b as unknown as ToolbarButtonDesc);
         }
       }
       setButtonMap(m);
     })();
+    (async () => {
+      const menu = await getMainMenu();
+      setMainMenu(menu.menus.flatMap(m => m.children) as unknown as MenuItem[]);
+    })();
   }, [projectName]);
 
-  const mainMenu = FALLBACK_MAIN_MENU();
-
-  const handleEvent = useCallback((
+  const handleEvent = useCallback(async (
     id: string,
     eventType: string,
   ) => {
-    (async () => {
-      let result: ToolbarEventResult | null;
-      try {
-        const rustResult: RustToolbarEventResult | null = await toolbarEvent(id, eventType);
-        result = rustResult as unknown as ToolbarEventResult | null;
-      } catch {
-        result = fallbackHandleEvent(descriptor, id, eventType);
+    const result = await toolbarEvent(id, eventType);
+    if (!result) return;
+
+    setButtonMap(prev => {
+      const next = new Map(prev);
+      next.set(id, result.button as unknown as ToolbarButtonDesc);
+      return next;
+    });
+
+    if (result.action === "show_menu") {
+      const btn = descriptor.groups.flatMap(g => g.buttons).find(b => b.presentation.id === id);
+      if (!btn) return;
+
+      if (id === "MainMenuButton") {
+        const el = document.querySelector(`[title="${btn.presentation.tooltip || btn.presentation.text}"]`);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          setDropdownState({
+            triggerId: id,
+            triggerRect: rect,
+            items: mainMenu,
+          });
+        }
       }
-      if (!result) return;
-
-      setButtonMap(prev => {
-        const next = new Map(prev);
-        next.set(id, result!.button);
-        return next;
-      });
-
-      if (result.action === "show_menu") {
-        const btn = descriptor.groups.flatMap(g => g.buttons).find(b => b.presentation.id === id);
-        if (!btn) return;
-
-        if (id === "MainMenuButton") {
-          const el = document.querySelector(`[title="${btn.presentation.tooltip || btn.presentation.text}"]`);
+    } else if (result.action === "click" || result.action === "show_main_menu") {
+      const clickAction = await toolbarClick(id);
+      switch (clickAction) {
+        case "show_main_menu": {
+          const el = document.querySelector('[title="Main Menu"]');
           if (el) {
-            const rect = el.getBoundingClientRect();
             setDropdownState({
               triggerId: id,
-              triggerRect: rect,
+              triggerRect: el.getBoundingClientRect(),
               items: mainMenu,
             });
           }
+          break;
         }
-      } else if (result.action === "click" || result.action === "show_main_menu") {
-        try {
-          const clickAction = await toolbarClick(id);
-          switch (clickAction) {
-            case "show_main_menu": {
-              const el = document.querySelector('[title="Main Menu"]');
-              if (el) {
-                setDropdownState({
-                  triggerId: id,
-                  triggerRect: el.getBoundingClientRect(),
-                  items: mainMenu,
-                });
-              }
-              break;
-            }
-            case "search_everywhere":
-              onSearchEverywhere();
-              break;
-            case "open_settings":
-              onOpenSettings();
-              break;
-          }
-        } catch {
-          switch (id) {
-            case "MainMenuButton": {
-              const el = document.querySelector('[title="Main Menu"]');
-              if (el) {
-                setDropdownState({
-                  triggerId: id,
-                  triggerRect: el.getBoundingClientRect(),
-                  items: mainMenu,
-                });
-              }
-              break;
-            }
-            case "SearchEverywhere":
-            case "SearchEverywhere.Right":
-              onSearchEverywhere();
-              break;
-            case "SettingsEntryPoint":
-              onOpenSettings();
-              break;
-          }
-        }
+        case "search_everywhere":
+          onSearchEverywhere();
+          break;
+        case "open_settings":
+          onOpenSettings();
+          break;
       }
-    })();
+    }
   }, [descriptor, mainMenu, onBackToWelcome, onSearchEverywhere, onToggleTheme, onOpenSettings]);
 
   const renderButtons = (buttons: ToolbarButtonDesc[]) =>
@@ -781,7 +350,7 @@ export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme
         <ToolbarButton
           key={btn.presentation.id}
           button={current}
-          onEvent={(eventType: string, _result: ToolbarEventResult) => handleEvent(btn.presentation.id, eventType)}
+          onEvent={(eventType: string) => handleEvent(btn.presentation.id, eventType)}
         />
       );
     });
