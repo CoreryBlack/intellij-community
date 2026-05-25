@@ -36,7 +36,7 @@ export default function StatusBar({ theme, onToggleTheme }: Props) {
     gap: 3,
     padding: "0 7px",
     height: "var(--ide-status-bar-item-height)",
-    borderRadius: "var(--ide-radius-sm)",
+    borderRadius: hover ? "var(--ide-status-bar-widget-hover-arc)" : 0,
     cursor: hover ? "pointer" : "default",
     color: "var(--ide-text-muted)",
     fontSize: "var(--ide-font-size-xs)",

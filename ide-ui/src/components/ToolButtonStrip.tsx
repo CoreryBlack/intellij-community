@@ -71,15 +71,15 @@ function ToolIcon({ type, size = 20 }: { type: string; size?: number }) {
 
 export default function ToolButtonStrip({ activeTool, onSelectTool, showSidebar, onToggleSidebar, showBottomPanel, onToggleBottomPanel }: Props) {
   const btnStyle = (isActive: boolean): React.CSSProperties => ({
-    width: "var(--ide-button-strip-button-size)",
-    height: "var(--ide-button-strip-button-size)",
+    width: "var(--toolbar-stripe-button-width)",
+    height: "var(--toolbar-stripe-button-height)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     border: "none",
-    borderRadius: "var(--ide-button-strip-button-radius)",
+    borderRadius: "var(--toolbar-stripe-button-arc)",
     cursor: "pointer",
-    color: isActive ? "var(--ide-accent-blue)" : "var(--ide-text-secondary)",
+    color: isActive ? "var(--toolbar-selected-fg)" : "var(--ide-text-muted)",
     background: isActive ? "var(--toolbar-selected-bg)" : "transparent",
     transition: "all var(--ide-transition-fast)",
     padding: 0,

@@ -4,6 +4,7 @@ use tauri::State;
 mod commands;
 mod fs;
 mod layout;
+mod terminal;
 
 pub use commands::*;
 pub use fs::*;
@@ -73,9 +74,6 @@ pub struct EditorState {
     pub cursor_position: CursorPosition,
 }
 
-/// AppState — mirrors the complete IDE frame state.
-/// Every piece of layout data the frontend needs comes from here.
-/// No design decisions in frontend code.
 pub struct AppState {
     pub project_paths: Mutex<Vec<String>>,
     pub current_project: Mutex<Option<String>>,
@@ -89,6 +87,7 @@ pub struct AppState {
     pub bottom_panel_visible: Mutex<bool>,
     pub active_tool_window: Mutex<String>,
     pub layout_descriptor: layout::LayoutDescriptor,
+    pub terminal_manager: terminal::TerminalManager,
 }
 
 impl Default for AppState {
@@ -118,6 +117,7 @@ impl Default for AppState {
             bottom_panel_visible: Mutex::new(true),
             active_tool_window: Mutex::new("project".into()),
             layout_descriptor: lt,
+            terminal_manager: terminal::TerminalManager::new(),
         }
     }
 }
@@ -148,6 +148,14 @@ pub fn run() {
             fs::read_file_content,
             fs::file_exists,
             fs::is_directory,
+            terminal::terminal_create,
+            terminal::terminal_write,
+            terminal::terminal_resize,
+            terminal::terminal_kill,
+            terminal::terminal_list,
+            terminal::get_problems,
+            terminal::get_services,
+            terminal::run_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

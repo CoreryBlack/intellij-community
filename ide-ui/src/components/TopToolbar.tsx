@@ -23,18 +23,19 @@ interface Props {
   onBackToWelcome: () => void;
   theme: "dark" | "light";
   onToggleTheme: () => void;
+  onSearchEverywhere: () => void;
 }
 
-export default function TopToolbar({ projectName, onBackToWelcome, theme, onToggleTheme }: Props) {
+export default function TopToolbar({ projectName, onBackToWelcome, theme, onToggleTheme, onSearchEverywhere }: Props) {
   const toolbarBtn: React.CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
     height: 30,
     minWidth: 30,
-    padding: "2px 6px",
+    padding: "var(--toolbar-button-insets-top) var(--toolbar-button-insets-right) var(--toolbar-button-insets-bottom) var(--toolbar-button-insets-left)",
     border: "none",
-    borderRadius: "var(--ide-radius-md)",
+    borderRadius: "var(--toolbar-button-arc)",
     background: "transparent",
     color: "var(--ide-text-muted)",
     cursor: "pointer",
@@ -112,6 +113,7 @@ export default function TopToolbar({ projectName, onBackToWelcome, theme, onTogg
           maxWidth: 280,
         }}
           title="Search Everywhere (Double Shift)"
+          onClick={onSearchEverywhere}
           onMouseOver={e => e.currentTarget.style.background = "var(--toolbar-bg-hovered)"}
           onMouseOut={e => e.currentTarget.style.background = "transparent"}
         >
