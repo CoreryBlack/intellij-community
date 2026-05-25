@@ -48,7 +48,7 @@
   --ide-scrollbar-thumb: var(--scrollbar-thumb-color);
   --ide-scrollbar-track: var(--scrollbar-track);
 
-  --ide-toolbar-height: calc(var(--main-toolbar-btn-size) + 14px);
+  --ide-toolbar-height: calc(var(--main-toolbar-btn-size) + 8px);
   --ide-status-bar-height: var(--status-bar-height);
   --ide-status-bar-top-border: var(--status-bar-top-border-width);
   --ide-status-bar-padding-h: 10px;

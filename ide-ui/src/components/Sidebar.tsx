@@ -202,9 +202,9 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0 8px",
+          padding: "0 6px",
           flexShrink: 0,
-          gap: 4,
+          gap: 2,
         }}>
           <span style={{
             fontSize: "var(--ide-font-size-xs)",
@@ -239,7 +239,7 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
             />
           ))}
           {activeTool === "search" && (
-            <div style={{ display: "flex", flexDirection: "column", padding: "10px", gap: 8 }}>
+            <div style={{ display: "flex", flexDirection: "column", padding: "6px 8px", gap: 6 }}>
               <input placeholder="Search..." style={{
                 width: "100%",
                 height: 24,
@@ -252,26 +252,26 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
                 outline: "none",
                 boxSizing: "border-box",
               }} />
-              <div style={{ color: "var(--ide-text-disabled)", fontSize: "var(--ide-font-size-sm)", textAlign: "center", paddingTop: 20 }}>
+              <div style={{ color: "var(--ide-text-disabled)", fontSize: "var(--ide-font-size-sm)", textAlign: "center", paddingTop: 12 }}>
                 Double Shift to search everywhere
               </div>
             </div>
           )}
           {activeTool === "git" && (
-            <div style={{ display: "flex", flexDirection: "column", padding: "10px", gap: 4 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "5px 8px", background: "var(--ide-bg-active)", borderRadius: "var(--ide-radius-sm)", fontSize: "var(--ide-font-size-xs)" }}>
+            <div style={{ display: "flex", flexDirection: "column", padding: "6px 8px", gap: 3 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 6px", background: "var(--ide-bg-active)", borderRadius: "var(--ide-radius-sm)", fontSize: "var(--ide-font-size-xs)" }}>
                 <span style={{ color: "var(--ide-text-secondary)" }}>Branch</span>
                 <span style={{ fontWeight: 500 }}>main</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "5px 8px", background: "var(--ide-bg-active)", borderRadius: "var(--ide-radius-sm)", fontSize: "var(--ide-font-size-xs)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 6px", background: "var(--ide-bg-active)", borderRadius: "var(--ide-radius-sm)", fontSize: "var(--ide-font-size-xs)" }}>
                 <span style={{ color: "var(--ide-text-secondary)" }}>Status</span>
                 <span style={{ color: "var(--ide-accent-green)" }}>Clean ✓</span>
               </div>
             </div>
           )}
           {activeTool === "run" && (
-            <div style={{ display: "flex", flexDirection: "column", padding: "10px", gap: 4 }}>
-              <div style={{ padding: "6px 8px", background: "var(--ide-bg-card)", borderRadius: "var(--ide-radius-md)", border: "1px solid var(--ide-border)" }}>
+            <div style={{ display: "flex", flexDirection: "column", padding: "6px 8px", gap: 3 }}>
+              <div style={{ padding: "4px 6px", background: "var(--ide-bg-card)", borderRadius: "var(--ide-radius-md)", border: "1px solid var(--ide-border)" }}>
                 <div style={{ fontSize: "var(--ide-font-size-sm)", fontWeight: 500, marginBottom: 2 }}>Spring Boot App</div>
                 <div style={{ fontSize: "var(--ide-font-size-xs)", color: "var(--ide-text-secondary)" }}>AstralMonitorApplication</div>
               </div>

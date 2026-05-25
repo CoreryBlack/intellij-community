@@ -736,7 +736,7 @@ export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme
   const renderButtons = (buttons: ToolbarButtonDesc[]) =>
     buttons.filter(b => b.presentation.visible).map(btn => {
       if (btn.presentation.action_kind === "Separator") {
-        return <div key={btn.presentation.id} style={{ width: 1, height: 18, background: "var(--ide-border-toolbar)", margin: "0 2px" }} />;
+        return <div key={btn.presentation.id} style={{ width: 1, height: 14, background: "var(--ide-border-toolbar)", margin: "0 1px" }} />;
       }
       const current = buttonMap.get(btn.presentation.id) || btn;
       return (
@@ -760,7 +760,7 @@ export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme
         alignItems: "center",
         background: "var(--ide-bg-toolbar)",
         borderBottom: "1px solid var(--ide-border-toolbar)",
-        padding: "0 6px",
+        padding: "0 var(--main-toolbar-padding-h)",
         flexShrink: 0,
         gap: "var(--ide-main-toolbar-layout-gap)",
       }}>

@@ -49,13 +49,13 @@ export default function BottomPanel({ bottomPanelTab, onBottomPanelTab, onHide, 
           display: "flex",
           alignItems: "center",
           background: "var(--tool-window-bg)",
-          padding: "0 8px",
+          padding: "0 4px",
           gap: 0,
           flexShrink: 0,
         }}>
           {BOTTOM_TABS.map(t => (
             <div key={t.id} style={{
-              padding: "4px 14px",
+              padding: "3px 10px",
               fontSize: "var(--ide-font-size-xs)",
               cursor: "pointer",
               borderRadius: "var(--editor-tab-arc) var(--editor-tab-arc) 0 0",
@@ -76,8 +76,8 @@ export default function BottomPanel({ bottomPanelTab, onBottomPanelTab, onHide, 
 
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 2 }}>
             <button style={{
-              width: 22,
-              height: 22,
+              width: 20,
+              height: 20,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -95,8 +95,8 @@ export default function BottomPanel({ bottomPanelTab, onBottomPanelTab, onHide, 
               onMouseOut={e => e.currentTarget.style.background = "transparent"}
             ><img src="/icons/splitVertically.svg" width={12} height={12} alt="" style={{ display: "block" }} /></button>
             <button onClick={onHide} style={{
-              width: 22,
-              height: 22,
+              width: 20,
+              height: 20,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
