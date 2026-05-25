@@ -186,7 +186,8 @@ impl SettingsManager {
 
     pub fn reset(&self) {
         let mut desc = self.descriptor.lock().unwrap();
-        for id in &desc.editor_state.modified_ids {
+        let modified_ids = desc.editor_state.modified_ids.clone();
+        for id in &modified_ids {
             mark_configurable_modified(&mut desc.groups, id, false);
         }
         desc.editor_state.modified_ids = vec![];

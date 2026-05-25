@@ -435,7 +435,7 @@ impl ToolbarManager {
         left_buttons.push(create_toolbar_button(
             "MainMenuButton", "Main Menu", "hamburger",
             ActionKind::Button, false,
-            "Main Menu", None, true, None,
+            Some("Main Menu"), None, true, None,
             &burger_icon_insets, 20,
         ));
 
@@ -443,7 +443,7 @@ impl ToolbarManager {
         left_buttons.push(create_toolbar_button(
             "main.toolbar.Project", &project_name, "project",
             ActionKind::Dropdown, true,
-            "Recent Projects", None, true, None,
+            Some("Recent Projects"), None, true, None,
             &main_toolbar_icon_insets, 18,
         ));
 
@@ -452,14 +452,14 @@ impl ToolbarManager {
             left_buttons.push(create_toolbar_button(
                 "main.toolbar.git.Branches", &g.branch, "git-branch",
                 ActionKind::Dropdown, true,
-                "Git Branches", None, true, None,
+                Some("Git Branches"), None, true, None,
                 &main_toolbar_icon_insets, 18,
             ));
 
             left_buttons.push(create_toolbar_button(
                 "CheckinProject", "Commit", "commit",
                 ActionKind::Button, false,
-                "Commit (Ctrl+K)", Some("Ctrl+K"),
+                Some("Commit (Ctrl+K)"), Some("Ctrl+K"),
                 true,
                 if g.has_changes { Some("●".into()) } else { None },
                 &main_toolbar_icon_insets, 18,
@@ -468,7 +468,7 @@ impl ToolbarManager {
             left_buttons.push(create_toolbar_button(
                 "Vcs.Push", "Push", "push",
                 ActionKind::Button, false,
-                "Push (Ctrl+Shift+K)", Some("Ctrl+Shift+K"),
+                Some("Push (Ctrl+Shift+K)"), Some("Ctrl+Shift+K"),
                 true,
                 if g.ahead > 0 { Some(g.ahead.to_string()) } else { None },
                 &main_toolbar_icon_insets, 18,
@@ -488,7 +488,7 @@ impl ToolbarManager {
         center_buttons.push(create_toolbar_button(
             "SearchEverywhere", "Search", "search",
             ActionKind::Button, false,
-            "Search Everywhere (Double Shift)", Some("Double Shift"),
+            Some("Search Everywhere (Double Shift)"), Some("Double Shift"),
             true, None,
             &main_toolbar_icon_insets, 18,
         ));
@@ -524,7 +524,7 @@ impl ToolbarManager {
         right_buttons.push(create_run_widget_button(
             "NewUiRunWidget", &active_name, "run",
             ActionKind::Dropdown, true,
-            "Run Configuration", None, true, None,
+            Some("Run Configuration"), None, true, None,
         ));
 
         // Run button — @see NewUiRunWidget run button
@@ -532,7 +532,7 @@ impl ToolbarManager {
         right_buttons.push(create_run_widget_button(
             "Run", "Run", "run",
             ActionKind::Button, false,
-            "Run (Shift+F10)", Some("Shift+F10"),
+            Some("Run (Shift+F10)"), Some("Shift+F10"),
             true, None,
         ));
 
@@ -540,7 +540,7 @@ impl ToolbarManager {
         right_buttons.push(create_run_widget_button(
             "Debug", "Debug", "debug",
             ActionKind::Button, false,
-            "Debug (Shift+F9)", Some("Shift+F9"),
+            Some("Debug (Shift+F9)"), Some("Shift+F9"),
             true, None,
         ));
 
@@ -550,7 +550,7 @@ impl ToolbarManager {
         right_buttons.push(create_toolbar_button(
             "SearchEverywhere.Right", "Search", "search",
             ActionKind::Button, false,
-            "Search Everywhere (Double Shift)", Some("Double Shift"),
+            Some("Search Everywhere (Double Shift)"), Some("Double Shift"),
             true, None,
             &main_toolbar_icon_insets, 18,
         ));
@@ -558,7 +558,7 @@ impl ToolbarManager {
         right_buttons.push(create_toolbar_button(
             "SettingsEntryPoint", "Settings", "settings",
             ActionKind::Button, false,
-            "Settings (Ctrl+Alt+,)", Some("Ctrl+Alt+,"),
+            Some("Settings (Ctrl+Alt+,)"), Some("Ctrl+Alt+,"),
             true, None,
             &main_toolbar_icon_insets, 18,
         ));

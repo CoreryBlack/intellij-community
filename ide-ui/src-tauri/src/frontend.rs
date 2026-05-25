@@ -77,7 +77,7 @@ impl ButtonClientState {
     /// @see ActionButton.resetMouseState():
     ///   myMouseDown = false;
     ///   ourGlobalMouseDown = false;
-    pub fn handle_mouse_up(&mut self) {
+    pub fn handle_mouse_up(&mut self) -> bool {
         let was_rollover = self.rollover;
         self.mouse_down = false;
         was_rollover // return whether we should perform action
