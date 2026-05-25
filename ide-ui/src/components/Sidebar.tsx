@@ -147,7 +147,7 @@ function TreeNode({ entry, depth, projectPath, onOpenFile, onContextMenu }: Tree
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.name}</span>
         {loading && <span style={{ color: "var(--ide-text-disabled)", fontSize: 9 }}>...</span>}
       </div>
-      {entry.is_dir && expanded && children.map((c, i) => (
+      {entry.is_dir && expanded && children.map((c) => (
         <TreeNode
           key={c.path}
           entry={c}
@@ -186,7 +186,7 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
       overflow: "hidden",
       flexShrink: 0,
       borderRadius: "var(--island-arc)",
-      background: "var(--island-border-color)",
+      background: "var(--layer-0-bg)",
       padding: "var(--island-tool-window-padding)",
     }}>
       <div style={{
@@ -195,7 +195,7 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
         flexDirection: "column",
         overflow: "hidden",
         borderRadius: "calc(var(--island-arc) - var(--island-tool-window-padding))",
-        background: "var(--ide-bg-tool-window)",
+        background: "var(--tool-window-bg)",
       }}>
         <div style={{
           height: "var(--ide-tool-window-header-height)",
@@ -228,7 +228,7 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
         </div>
 
         <div style={{ flex: 1, overflow: "auto", padding: "2px 0" }}>
-          {activeTool === "project" && fileTree.map((entry, i) => (
+          {activeTool === "project" && fileTree.map((entry) => (
             <TreeNode
               key={entry.path}
               entry={entry}

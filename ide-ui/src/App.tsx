@@ -4,6 +4,7 @@ import WelcomeScreen from "./pages/WelcomeScreen";
 import MainLayout from "./pages/MainLayout";
 import ContextMenu from "./components/ContextMenu";
 import SearchEverywhere from "./components/SearchEverywhere";
+import SettingsDialog from "./components/SettingsDialog";
 import NotificationStack from "./components/NotificationStack";
 import { IdeStoreContext, ideReducer, createInitialIdeState } from "./store/ideStore";
 import { findAction } from "./services/keymap";
@@ -116,6 +117,10 @@ export default function App() {
 
         {state.modal?.type === "search-everywhere" && (
           <SearchEverywhere onClose={() => dispatch({ type: "HIDE_MODAL" })} />
+        )}
+
+        {state.modal?.type === "settings" && (
+          <SettingsDialog onClose={() => dispatch({ type: "HIDE_MODAL" })} />
         )}
 
         <NotificationStack />

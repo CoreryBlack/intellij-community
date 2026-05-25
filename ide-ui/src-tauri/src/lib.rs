@@ -7,6 +7,7 @@ mod fs;
 mod layout;
 mod main_toolbar;
 mod menu;
+mod settings;
 mod statusbar;
 mod terminal;
 mod welcome;
@@ -98,6 +99,7 @@ pub struct AppState {
     pub statusbar_manager: statusbar::StatusBarManager,
     pub menu_manager: menu::MenuManager,
     pub welcome_manager: welcome::WelcomeScreenManager,
+    pub settings_manager: settings::SettingsManager,
 }
 
 impl Default for AppState {
@@ -133,6 +135,7 @@ impl Default for AppState {
             statusbar_manager: statusbar::StatusBarManager::new(),
             menu_manager: menu::MenuManager::new(),
             welcome_manager: welcome::WelcomeScreenManager::new(),
+            settings_manager: settings::SettingsManager::new(),
         }
     }
 }
@@ -192,6 +195,12 @@ pub fn run() {
             welcome::welcome_set_active_tab,
             statusbar::update_status_memory,
             statusbar::toggle_memory_indicator,
+            settings::get_settings_descriptor,
+            settings::settings_select_configurable,
+            settings::settings_search,
+            settings::settings_mark_modified,
+            settings::settings_apply,
+            settings::settings_reset,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

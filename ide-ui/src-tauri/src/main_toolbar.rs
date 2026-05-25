@@ -290,6 +290,7 @@ pub struct ToolbarDescriptor {
     pub project: ProjectInfo,
     pub run_configurations: Vec<RunConfiguration>,
     pub active_run_config: Option<String>,
+    pub run_widget_state: RunWidgetState,
     pub git: Option<GitState>,
     pub active_file_name: Option<String>,
     /// @see HeaderIconUpdater — "dark" or "light"
@@ -314,6 +315,13 @@ pub struct RunConfiguration {
     pub type_name: String,
     pub icon: String,
     pub pinned: bool,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum RunWidgetState {
+    Idle,
+    Running,
+    Debugging,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -498,6 +506,11 @@ impl ToolbarManager {
          * @see MainToolbar.getMainToolbarGroups():
          *   GroupInfo("MainToolbarRight", ActionsTreeUtil.getMainToolbarRight(), RIGHT)
          * Contains: NewUiRunWidget + Run/Debug + SearchEverywhere + SettingsEntryPoint
+         *
+         * @see NewUiRunWidget — uses RunWidgetButtonLook (arc=12, suppress_border=true)
+         *   Run button: green icon color (icon-green-stroke)
+         *   Debug button: muted icon color
+         *   Running state: runningBackground (toolbar-run-bg)
          */
         let mut right_buttons = vec![];
 
@@ -506,27 +519,29 @@ impl ToolbarManager {
             .and_then(|id| run_configs.iter().find(|c| &c.id == id).map(|c| c.name.clone()))
             .unwrap_or_else(|| "No configuration".into());
 
-        right_buttons.push(create_toolbar_button(
+        // NewUiRunWidget — @see NewUiRunWidget.kt
+        //   Uses RunWidgetButtonLook: arc=12, iconSize=20, suppress_border=true
+        right_buttons.push(create_run_widget_button(
             "NewUiRunWidget", &active_name, "run",
             ActionKind::Dropdown, true,
             "Run Configuration", None, true, None,
-            &main_toolbar_icon_insets, 20,
         ));
 
-        right_buttons.push(create_toolbar_button(
+        // Run button — @see NewUiRunWidget run button
+        //   Uses RunWidgetButtonLook with green icon (icon-green-stroke)
+        right_buttons.push(create_run_widget_button(
             "Run", "Run", "run",
             ActionKind::Button, false,
             "Run (Shift+F10)", Some("Shift+F10"),
             true, None,
-            &main_toolbar_icon_insets, 20,
         ));
 
-        right_buttons.push(create_toolbar_button(
+        // Debug button — @see NewUiRunWidget debug button
+        right_buttons.push(create_run_widget_button(
             "Debug", "Debug", "debug",
             ActionKind::Button, false,
             "Debug (Shift+F9)", Some("Shift+F9"),
             true, None,
-            &main_toolbar_icon_insets, 20,
         ));
 
         // Separator
@@ -596,12 +611,10 @@ fn create_toolbar_button(
     icon_insets: &Insets,
     icon_size: u32,
 ) -> ToolbarButtonDesc {
-    /* ── Look params — @see header_toolbar_button_look() factory ── */
     let look_params = button_look::header_toolbar_button_look(Some(icon_size));
     let mut adjusted_look = look_params.clone();
     adjusted_look.icon_insets = icon_insets.clone();
 
-    /* ── Presentation — mirrors Presentation class ── */
     let presentation = ActionPresentation {
         id: id.into(),
         text: label.into(),
@@ -618,11 +631,8 @@ fn create_toolbar_button(
         badge,
     };
 
-    /* ── State — default NORMAL, not focused ── */
     let state = ButtonState::Normal;
     let focused = false;
-
-    /* ── Render output — @see compute_button_render() ── */
     let is_action_group = popup_group;
     let render_output = button_look::compute_button_render(
         &adjusted_look,
@@ -639,6 +649,64 @@ fn create_toolbar_button(
     ToolbarButtonDesc {
         presentation,
         look_params: adjusted_look,
+        render_output,
+        state,
+        focused,
+        current_width: 30,
+        current_height: 30,
+    }
+}
+
+/// Creates a RunWidget button with RunWidgetButtonLook.
+/// @see NewUiRunWidget.kt — uses RunWidgetButtonLook (arc=12, suppress_border=true)
+/// @see RunWidget.theme.json — runIconColor=icon-green-stroke, runningBackground=toolbar-run-bg
+fn create_run_widget_button(
+    id: &str,
+    label: &str,
+    icon: &str,
+    action_kind: ActionKind,
+    popup_group: bool,
+    tooltip: Option<&str>,
+    shortcut: Option<&str>,
+    enabled: bool,
+    badge: Option<String>,
+) -> ToolbarButtonDesc {
+    let look_params = button_look::run_widget_button_look();
+
+    let presentation = ActionPresentation {
+        id: id.into(),
+        text: label.into(),
+        description: tooltip.map(|s| s.into()),
+        icon: icon.into(),
+        action_kind: action_kind.clone(),
+        shortcut: shortcut.map(|s| s.into()),
+        tooltip: tooltip.map(|s| s.into()),
+        enabled,
+        visible: true,
+        popup_group,
+        hide_dropdown_icon: false,
+        toggle_state: None,
+        badge,
+    };
+
+    let state = ButtonState::Normal;
+    let focused = false;
+    let is_action_group = popup_group;
+    let render_output = button_look::compute_button_render(
+        &look_params,
+        state,
+        enabled,
+        focused,
+        is_action_group,
+        popup_group,
+        false,
+        look_params.minimum_button_size.width,
+        look_params.minimum_button_size.height,
+    );
+
+    ToolbarButtonDesc {
+        presentation,
+        look_params,
         render_output,
         state,
         focused,
@@ -709,6 +777,7 @@ impl Default for ToolbarDescriptor {
                 },
             ],
             active_run_config: Some("spring-boot".into()),
+            run_widget_state: RunWidgetState::Idle,
             git: Some(GitState {
                 branch: "main".into(),
                 remote: "origin".into(),

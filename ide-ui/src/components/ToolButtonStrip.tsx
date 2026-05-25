@@ -24,7 +24,7 @@
  * bottomStripe buttons (BOTTOM anchor): Terminal, Problems, Services, Build
  */
 
-type ToolWindow = "project" | "search" | "git" | "run" | "structure";
+type ToolWindow = "project" | "search" | "git" | "run" | "structure" | "terminal" | "problems" | "services";
 
 interface Props {
   activeTool: ToolWindow;

@@ -543,7 +543,7 @@ function fallbackHandleEvent(
  * ActionIcon — purely mechanical SVG renderer
  * ═══════════════════════════════════════════ */
 
-function ActionIcon({ icon, size = 16 }: { icon: string; size?: number }) {
+function ActionIcon({ icon, size = 16, isRunWidget = false }: { icon: string; size?: number; isRunWidget?: boolean }) {
   const iconMap: Record<string, string> = {
     hamburger: "menu",
     project: "folder",
@@ -558,7 +558,7 @@ function ActionIcon({ icon, size = 16 }: { icon: string; size?: number }) {
   };
   const officialName = iconMap[icon];
   if (officialName) {
-    return <img src={`/icons/${officialName}.svg`} width={size} height={size} alt="" style={{ display: "block" }} />;
+    return <img src={`/icons/${officialName}.svg`} width={size} height={size} alt="" style={{ display: "block", filter: isRunWidget && icon === "run" ? "none" : undefined }} />;
   }
   return <span style={{ fontSize: size - 2 }}>?</span>;
 }
@@ -584,6 +584,7 @@ function ToolbarButton({
   const { presentation, look_params, render_output } = button;
   const isDropdown = presentation.action_kind === "Dropdown" || render_output.show_down_arrow;
   const isHeaderToolbar = look_params.kind === "HeaderToolbar";
+  const isRunWidget = look_params.kind === "RunWidget";
   const hasLabel = !!presentation.text;
   const iconSize = render_output.icon_size;
 
@@ -631,11 +632,11 @@ function ToolbarButton({
         boxShadow: focusRing,
       }}
     >
-      <ActionIcon icon={presentation.icon} size={iconSize} />
+      <ActionIcon icon={presentation.icon} size={iconSize} isRunWidget={isRunWidget} />
       {hasLabel && <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{presentation.text}</span>}
       {isDropdown && (
-        <svg width="7" height="4" viewBox="0 0 7 4" fill="none" style={{ color: "var(--ide-text-disabled)", flexShrink: 0 }}>
-          <path d="M0 0l3.5 4L7 0" fill="currentColor" />
+        <svg width="7" height="4" viewBox="0 0 7 4" fill="none" style={{ color: "var(--text-disabled)", flexShrink: 0, marginLeft: 2 }}>
+          <path d="M1 0.5L3.5 3.5L6 0.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
       {presentation.badge && <span style={{ color: "var(--ide-accent-blue)", fontSize: 11, lineHeight: 1, fontWeight: 600 }}>{presentation.badge}</span>}
@@ -652,9 +653,10 @@ interface Props {
   onBackToWelcome: () => void;
   onToggleTheme: () => void;
   onSearchEverywhere: () => void;
+  onOpenSettings: () => void;
 }
 
-export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme, onSearchEverywhere }: Props) {
+export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme, onSearchEverywhere, onOpenSettings }: Props) {
   const [descriptor, setDescriptor] = useState<ToolbarDescriptor>(() => FALLBACK_TOOLBAR_DESCRIPTOR(projectName));
   const [buttonMap, setButtonMap] = useState<Map<string, ToolbarButtonDesc>>(new Map());
   const [dropdownState, setDropdownState] = useState<{
@@ -725,11 +727,11 @@ export default function TopToolbar({ projectName, onBackToWelcome, onToggleTheme
           onSearchEverywhere();
           break;
         case "SettingsEntryPoint":
-          onToggleTheme();
+          onOpenSettings();
           break;
       }
     }
-  }, [descriptor, mainMenu, onBackToWelcome, onSearchEverywhere, onToggleTheme]);
+  }, [descriptor, mainMenu, onBackToWelcome, onSearchEverywhere, onToggleTheme, onOpenSettings]);
 
   const renderButtons = (buttons: ToolbarButtonDesc[]) =>
     buttons.filter(b => b.presentation.visible).map(btn => {

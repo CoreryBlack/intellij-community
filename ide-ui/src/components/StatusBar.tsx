@@ -94,6 +94,7 @@ function FALLBACK_STATUS_BAR_DESCRIPTOR(): StatusBarDescriptor {
 interface Props {
   theme: "dark" | "light";
   onToggleTheme: () => void;
+  onOpenSettings: () => void;
 }
 
 function StatusWidgetIcon({ name, color }: { name: string; color: string }) {
@@ -114,13 +115,16 @@ function StatusWidgetIcon({ name, color }: { name: string; color: string }) {
 
 function StatusWidget({
   widget,
-  onToggleTheme,
+  onToggleTheme: _onToggleTheme,
+  onOpenSettings,
 }: {
   widget: StatusBarWidget;
   theme?: "dark" | "light";
   onToggleTheme: () => void;
+  onOpenSettings: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   const baseStyle: React.CSSProperties = {
     display: "inline-flex",
@@ -133,24 +137,32 @@ function StatusWidget({
     color: widget.style.text_color || "var(--text-muted)",
     fontSize: "var(--font-size-xs)",
     fontWeight: widget.style.font_weight || undefined,
-    background: hovered && widget.style.hover ? "var(--toolbar-bg-hovered)" : widget.style.background || "transparent",
+    background: pressed && widget.style.hover
+      ? "var(--toolbar-bg-pressed)"
+      : hovered && widget.style.hover
+        ? "var(--toolbar-bg-hovered)"
+        : widget.style.background || "transparent",
     transition: "background 0.08s ease",
     border: "none",
     outline: "none",
     whiteSpace: "nowrap" as const,
+    userSelect: "none" as const,
   };
 
   const isSettingsEntryPoint = widget.id === "settingsEntryPointWidget";
 
   const handleClick = useCallback(() => {
-    if (isSettingsEntryPoint) onToggleTheme();
-  }, [isSettingsEntryPoint, onToggleTheme]);
+    if (isSettingsEntryPoint) onOpenSettings();
+  }, [isSettingsEntryPoint, onOpenSettings]);
 
   const iconColor = widget.style.icon_color || "var(--text-muted)";
 
   if (widget.widget_type === "Icon") {
     return (
-      <span style={baseStyle} title={widget.tooltip || undefined} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={handleClick}>
+      <span style={baseStyle} title={widget.tooltip || undefined}
+        onMouseEnter={() => setHovered(true)} onMouseLeave={() => { setHovered(false); setPressed(false); }}
+        onMouseDown={() => setPressed(true)} onMouseUp={() => setPressed(false)}
+        onClick={handleClick}>
         {widget.icon && <StatusWidgetIcon name={widget.icon} color={iconColor} />}
       </span>
     );
@@ -162,7 +174,10 @@ function StatusWidget({
 
   if (isSettingsEntryPoint) {
     return (
-      <button style={baseStyle} title={widget.tooltip || "Toggle theme"} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onClick={handleClick}>
+      <button style={baseStyle} title={widget.tooltip || "Settings"}
+        onMouseEnter={() => setHovered(true)} onMouseLeave={() => { setHovered(false); setPressed(false); }}
+        onMouseDown={() => setPressed(true)} onMouseUp={() => setPressed(false)}
+        onClick={handleClick}>
         {widget.icon && <StatusWidgetIcon name={widget.icon} color={iconColor} />}
         {widget.text}
       </button>
@@ -170,7 +185,9 @@ function StatusWidget({
   }
 
   return (
-    <span style={baseStyle} title={widget.tooltip ? (widget.shortcut ? `${widget.tooltip} (${widget.shortcut})` : widget.tooltip) : undefined} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+    <span style={baseStyle} title={widget.tooltip ? (widget.shortcut ? `${widget.tooltip} (${widget.shortcut})` : widget.tooltip) : undefined}
+      onMouseEnter={() => setHovered(true)} onMouseLeave={() => { setHovered(false); setPressed(false); }}
+      onMouseDown={() => setPressed(true)} onMouseUp={() => setPressed(false)}>
       {widget.icon && <StatusWidgetIcon name={widget.icon} color={iconColor} />}
       {widget.text}
     </span>
@@ -196,7 +213,7 @@ function MemoryIndicator({ memory }: { memory: MemoryInfo }) {
   );
 }
 
-export default function StatusBar({ theme, onToggleTheme }: Props) {
+export default function StatusBar({ theme, onToggleTheme, onOpenSettings }: Props) {
   const [descriptor] = useState<StatusBarDescriptor>(() => FALLBACK_STATUS_BAR_DESCRIPTOR());
 
   const visibleLeft = descriptor.left_widgets.filter(w => w.visible);
@@ -216,7 +233,7 @@ export default function StatusBar({ theme, onToggleTheme }: Props) {
     }}>
       {visibleLeft.length > 0 && (
         <div style={{ display: "flex", alignItems: "center", gap: 1, paddingRight: 4, borderRight: "1px solid var(--separator-color)" }}>
-          {visibleLeft.map(w => <StatusWidget key={w.id} widget={w} theme={theme} onToggleTheme={onToggleTheme} />)}
+          {visibleLeft.map(w => <StatusWidget key={w.id} widget={w} theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} />)}
         </div>
       )}
 
@@ -229,15 +246,14 @@ export default function StatusBar({ theme, onToggleTheme }: Props) {
             </div>
           </div>
         ) : visibleCenter.length > 0 ? (
-          visibleCenter.map(w => <StatusWidget key={w.id} widget={w} theme={theme} onToggleTheme={onToggleTheme} />)
+          visibleCenter.map(w => <StatusWidget key={w.id} widget={w} theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} />)
         ) : (
           <span style={{ color: "var(--text-secondary)", fontSize: "var(--font-size-xs)" }}>{descriptor.info_message}</span>
         )}
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 1, paddingLeft: 4, borderLeft: "1px solid var(--separator-color)" }}>
-        {visibleRight.map(w => <StatusWidget key={w.id} widget={w} theme={theme} onToggleTheme={onToggleTheme} />)}
-        {/* @see MemoryUsagePanel — rightmost position */}
+        {visibleRight.map(w => <StatusWidget key={w.id} widget={w} theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={onOpenSettings} />)}
         <MemoryIndicator memory={descriptor.memory} />
       </div>
     </div>

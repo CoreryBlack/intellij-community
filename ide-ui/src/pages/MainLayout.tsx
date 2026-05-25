@@ -127,6 +127,7 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
         onBackToWelcome={onBackToWelcome}
         onToggleTheme={onToggleTheme}
         onSearchEverywhere={() => dispatch({ type: "SHOW_MODAL", modal: { type: "search-everywhere" } })}
+        onOpenSettings={() => dispatch({ type: "SHOW_MODAL", modal: { type: "settings" } })}
       />
 
       {/* ═══ Main content area with 4px gap around islands ═══
@@ -243,7 +244,7 @@ export default function MainLayout({ projectPath, theme, onToggleTheme, onBackTo
        *   topBorderWidth = 0
        *   background = main-window-bg
        */}
-      <StatusBar theme={theme} onToggleTheme={onToggleTheme} />
+      <StatusBar theme={theme} onToggleTheme={onToggleTheme} onOpenSettings={() => dispatch({ type: "SHOW_MODAL", modal: { type: "settings" } })} />
     </div>
   );
 }
