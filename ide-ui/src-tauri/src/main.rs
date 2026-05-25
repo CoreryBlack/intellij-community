@@ -3,7 +3,7 @@
 
 fn main() {
     std::thread::Builder::new()
-        .stack_size(8 * 1024 * 1024)
+        .stack_size(16 * 1024 * 1024)
         .name("ide-main".into())
         .spawn(|| {
             intellij_ide_lib::run()

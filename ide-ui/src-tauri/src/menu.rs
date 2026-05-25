@@ -12,7 +12,7 @@
  */
 
 use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
+use std::sync::{Mutex, OnceLock};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub enum MenuItemType {
@@ -54,15 +54,26 @@ pub struct MenuManager {
     main_menu: Mutex<MainMenuDescriptor>,
 }
 
+static MAIN_MENU: OnceLock<MainMenuDescriptor> = OnceLock::new();
+
+fn build_or_get_main_menu() -> &'static MainMenuDescriptor {
+    MAIN_MENU.get_or_init(|| MenuManager::build_main_menu())
+}
+
 impl MenuManager {
     pub fn new() -> Self {
         Self {
-            main_menu: Mutex::new(Self::build_main_menu()),
+            main_menu: Mutex::new(MainMenuDescriptor { menus: vec![] }),
         }
     }
 
     pub fn get_main_menu(&self) -> MainMenuDescriptor {
-        self.main_menu.lock().unwrap().clone()
+        let desc = build_or_get_main_menu();
+        let mut cache = self.main_menu.lock().unwrap();
+        if cache.menus.is_empty() {
+            *cache = desc.clone();
+        }
+        cache.clone()
     }
 
     pub fn get_dropdown_menu(&self, trigger_id: &str, x: i32, y: i32) -> Option<ToolbarDropdownMenu> {
