@@ -108,7 +108,6 @@ export default function ToolButtonStrip({ activeTool, onSelectTool, showSidebar,
             if (activeTool === t.id && showSidebar) {
               onToggleSidebar();
             } else {
-              if (!showSidebar) onToggleSidebar();
               onSelectTool(t.id);
             }
           }}
