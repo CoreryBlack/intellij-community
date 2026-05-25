@@ -419,8 +419,8 @@ impl ToolbarManager {
          * @see createActionBar(): toolbar.setActionButtonBorder(JBUI.Borders.empty(mainToolbarButtonInsets()))
          * mainToolbarButtonInsets() returns insets for the toolbar button border
          */
-        let main_toolbar_icon_insets = Insets::new(6, 5, 4, 5);
-        let burger_icon_insets = Insets::new(4, 5, 4, 5);
+        let main_toolbar_icon_insets = Insets::new(4, 4, 4, 4);
+        let burger_icon_insets = Insets::new(3, 4, 3, 4);
 
         /* ── Build LEFT group (MainToolbarLeft) ──
          * @see MainToolbar.getMainToolbarGroups():
@@ -444,7 +444,7 @@ impl ToolbarManager {
             "main.toolbar.Project", &project_name, "project",
             ActionKind::Dropdown, true,
             "Recent Projects", None, true, None,
-            &main_toolbar_icon_insets, 20,
+            &main_toolbar_icon_insets, 18,
         ));
 
         // VCS group — @see MainToolbarVCSGroup in plugin XML
@@ -453,7 +453,7 @@ impl ToolbarManager {
                 "main.toolbar.git.Branches", &g.branch, "git-branch",
                 ActionKind::Dropdown, true,
                 "Git Branches", None, true, None,
-                &main_toolbar_icon_insets, 20,
+                &main_toolbar_icon_insets, 18,
             ));
 
             left_buttons.push(create_toolbar_button(
@@ -462,7 +462,7 @@ impl ToolbarManager {
                 "Commit (Ctrl+K)", Some("Ctrl+K"),
                 true,
                 if g.has_changes { Some("●".into()) } else { None },
-                &main_toolbar_icon_insets, 20,
+                &main_toolbar_icon_insets, 18,
             ));
 
             left_buttons.push(create_toolbar_button(
@@ -471,7 +471,7 @@ impl ToolbarManager {
                 "Push (Ctrl+Shift+K)", Some("Ctrl+Shift+K"),
                 true,
                 if g.ahead > 0 { Some(g.ahead.to_string()) } else { None },
-                &main_toolbar_icon_insets, 20,
+                &main_toolbar_icon_insets, 18,
             ));
         }
 
@@ -490,7 +490,7 @@ impl ToolbarManager {
             ActionKind::Button, false,
             "Search Everywhere (Double Shift)", Some("Double Shift"),
             true, None,
-            &main_toolbar_icon_insets, 20,
+            &main_toolbar_icon_insets, 18,
         ));
 
         if let Some(ref name) = active_file {
@@ -552,7 +552,7 @@ impl ToolbarManager {
             ActionKind::Button, false,
             "Search Everywhere (Double Shift)", Some("Double Shift"),
             true, None,
-            &main_toolbar_icon_insets, 20,
+            &main_toolbar_icon_insets, 18,
         ));
 
         right_buttons.push(create_toolbar_button(
@@ -560,7 +560,7 @@ impl ToolbarManager {
             ActionKind::Button, false,
             "Settings (Ctrl+Alt+,)", Some("Ctrl+Alt+,"),
             true, None,
-            &main_toolbar_icon_insets, 20,
+            &main_toolbar_icon_insets, 18,
         ));
 
         /* ── Assemble groups ──

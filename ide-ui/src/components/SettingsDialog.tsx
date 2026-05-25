@@ -387,7 +387,7 @@ function NewUISettings() {
   return (
     <>
       <SettingRow label="Compact Mode">
-        <Checkbox checked={false} label="Use compact mode" />
+        <Checkbox checked={true} label="Use compact mode (default)" />
       </SettingRow>
       <SettingRow label="Main Toolbar">
         <Checkbox checked={true} label="Show main toolbar" />
@@ -673,7 +673,7 @@ export default function SettingsDialog({ onClose }: Props) {
                 onChange={e => setSearchQuery(e.target.value)}
                 style={{
                   width: "100%",
-                  height: 28,
+                  height: 24,
                   padding: "0 8px",
                   border: "1px solid var(--control-border)",
                   borderRadius: 4,

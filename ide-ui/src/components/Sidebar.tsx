@@ -242,7 +242,7 @@ export default function Sidebar({ activeTool, projectPath, fileTree, onOpenFile,
             <div style={{ display: "flex", flexDirection: "column", padding: "10px", gap: 8 }}>
               <input placeholder="Search..." style={{
                 width: "100%",
-                height: 28,
+                height: 24,
                 padding: "0 8px",
                 border: "1px solid var(--ide-border)",
                 borderRadius: "var(--ide-radius-sm)",

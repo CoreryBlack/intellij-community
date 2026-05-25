@@ -401,8 +401,7 @@
   --banner-info-border: var(--feedback-brand-border);
   --banner-ai-bg: var(--feedback-ai-bg);
   --banner-ai-border: var(--feedback-ai-border);
-  --banner-arc: 12px;
-  --banner-arc-compact: 8px;
+  --banner-arc: 8px;
 
   /* ════════════════════════════════════════════
    * Borders (ManyIslandsDark.theme.json lines 491-492)
@@ -416,8 +415,7 @@
 
   --button-arc: 8px;
   --button-minimum-size-width: 72px;
-  --button-minimum-size-height: 28px;
-  --button-minimum-size-height-compact: 24px;
+  --button-minimum-size-height: 24px;
   --button-start-bg: transparent;
   --button-end-bg: transparent;
   --button-start-border: var(--control-border);
@@ -449,10 +447,8 @@
    * ════════════════════════════════════════════ */
 
   --combobox-minimum-size-width: 49px;
-  --combobox-minimum-size-height: 28px;
-  --combobox-minimum-size-height-compact: 24px;
-  --combobox-padding: 1px 9px 1px 6px;
-  --combobox-padding-compact: 1px 6px 1px 6px;
+  --combobox-minimum-size-height: 24px;
+  --combobox-padding: 1px 6px 1px 6px;
   --combobox-arrow-bg: var(--control-bg);
   --combobox-arrow-non-editable-bg: var(--control-bg-raised);
   --combobox-bg: var(--popup-bg);
@@ -463,8 +459,7 @@
    * Component (ManyIslandsDark.theme.json lines 660-670)
    * ════════════════════════════════════════════ */
 
-  --component-arc: 8px;
-  --component-arc-compact: 6px;
+  --component-arc: 6px;
   --component-arrow-area-width: 28px;
   --component-border: var(--control-border);
   --component-focused-border: var(--dialog-bg);
@@ -516,14 +511,10 @@
   --editor-tab-underlined-bg: var(--tab-selected-bg-active);
   --editor-tab-inactive-underlined-border: var(--tab-selected-border-inactive);
   --editor-tab-inactive-underlined-bg: var(--tab-selected-bg-inactive);
-  --editor-tab-inset-top: -6px;
-  --editor-tab-inset-left: 8px;
-  --editor-tab-inset-bottom: -6px;
-  --editor-tab-inset-right: 8px;
-  --editor-tab-inset-top-compact: -2px;
-  --editor-tab-inset-left-compact: 6px;
-  --editor-tab-inset-bottom-compact: -2px;
-  --editor-tab-inset-right-compact: 4px;
+  --editor-tab-inset-top: -2px;
+  --editor-tab-inset-left: 6px;
+  --editor-tab-inset-bottom: -2px;
+  --editor-tab-inset-right: 4px;
 
   /* ════════════════════════════════════════════
    * InlineBanner (ManyIslandsDark.theme.json lines 478-481)
@@ -537,12 +528,9 @@
    * ════════════════════════════════════════════ */
 
   --islands-enabled: 1;
-  --island-arc: 20px;
-  --island-arc-compact: 16px;
-  --island-border-arc-length: 14px;
-  --island-border-arc-length-compact: 10px;
-  --island-border-width: 6px;
-  --island-border-width-compact: 4px;
+  --island-arc: 16px;
+  --island-border-arc-length: 10px;
+  --island-border-width: 4px;
   --island-border-color: var(--tool-window-bg);
   --island-inactive-alpha: 0.56;
   --island-tool-window-alpha: 0.2;
@@ -572,8 +560,7 @@
 
   --list-hover-bg: var(--selection-bg-hovered);
   --list-hover-inactive-bg: var(--selection-bg-hovered);
-  --list-row-height: 24px;
-  --list-row-height-compact: 22px;
+  --list-row-height: 22px;
   --list-border: 4px;
 
   --list-button-separator: var(--toolbar-border);
@@ -756,34 +743,33 @@
    * ════════════════════════════════════════════ */
 
   --tree-row-height: var(--list-row-height);
-  --tree-row-height-compact: var(--list-row-height-compact);
   --tree-indent-guide-border: var(--gray-40);
 
   /* ════════════════════════════════════════════
    * Layout Dimensions (from JBUI.java / IslandsUICustomization.kt)
    * ════════════════════════════════════════════ */
 
-  --main-toolbar-btn-size: 30px;
-  --main-toolbar-btn-icon-size: 20px;
-  --main-toolbar-btn-arc: 12px;
+  --main-toolbar-btn-size: 26px;
+  --main-toolbar-btn-icon-size: 18px;
+  --main-toolbar-btn-arc: 8px;
   --main-toolbar-btn-focus-width: 2px;
-  --main-toolbar-layout-gap: 10px;
-  --main-toolbar-padding-h: 6px;
-  --main-toolbar-font: 13px;
+  --main-toolbar-layout-gap: 6px;
+  --main-toolbar-padding-h: 4px;
+  --main-toolbar-font: 12px;
 
-  --stripe-button-width: 37px;
-  --stripe-button-height: 40px;
-  --stripe-button-icon-size: 20px;
-  --stripe-button-arc: 8px;
+  --stripe-button-width: 33px;
+  --stripe-button-height: 34px;
+  --stripe-button-icon-size: 18px;
+  --stripe-button-arc: 6px;
 
-  --tool-window-header-height: 41px;
-  --tool-window-width: 240px;
+  --tool-window-header-height: 34px;
+  --tool-window-width: 220px;
 
-  --button-strip-width: 40px;
-  --button-strip-gap: 2px;
+  --button-strip-width: 34px;
+  --button-strip-gap: 1px;
 
-  --editor-tab-height: 28px;
-  --editor-tab-outer-height: 40px;
+  --editor-tab-height: 24px;
+  --editor-tab-outer-height: 32px;
 
   --island-empty-gap: 4px;
   --island-tool-window-padding: 3px;

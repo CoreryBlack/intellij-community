@@ -268,17 +268,17 @@ function determineAction(btn: ToolbarButtonDesc): string | null {
 function makeLook(isBurger?: boolean): ButtonLookParams {
   return {
     kind: "HeaderToolbar",
-    button_arc: 12,
-    icon_size: 20,
-    minimum_button_size: { width: 30, height: 30 },
-    preferred_button_size: { width: 30, height: 30 },
+    button_arc: 8,
+    icon_size: 18,
+    minimum_button_size: { width: 26, height: 26 },
+    preferred_button_size: { width: 26, height: 26 },
     suppress_border: true,
     focus_only_border: true,
     focus_border_width: 2,
     focus_border_color: "var(--ide-focus-color)",
-    background_arc: 12,
+    background_arc: 8,
     disable_filter: "lightThemeDarkHeader",
-    icon_insets: isBurger ? { top: 4, left: 5, bottom: 4, right: 5 } : { top: 6, left: 5, bottom: 4, right: 5 },
+    icon_insets: isBurger ? { top: 4, left: 5, bottom: 4, right: 5 } : { top: 4, left: 4, bottom: 4, right: 4 },
     component_insets: { top: 0, left: 0, bottom: 0, right: 0 },
   };
 }

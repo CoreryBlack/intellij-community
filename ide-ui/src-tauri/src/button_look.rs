@@ -11,7 +11,7 @@
  * Class hierarchy (mirroring official):
  *   ActionButtonLook (abstract)
  *   ├── IdeaActionButtonLook (default round-rect rendering)
- *   │   ├── HeaderToolbarButtonLook (main toolbar: arc=12, focus-only border)
+ *   │   ├── HeaderToolbarButtonLook (main toolbar: arc=8, focus-only border, compact)
  *   │   ├── SquareStripeButtonLook (tool window stripe buttons)
  *   │   └── RunWidgetButtonLook (run/stop state backgrounds)
  *   ├── EditorToolbarButtonLook (editor toolbar, uses editor color scheme)
@@ -200,7 +200,7 @@ pub struct ButtonLookDesc {
 pub enum ButtonLookKind {
     /// @see IdeaActionButtonLook: default round-rect (DarculaUIUtil.BUTTON_ARC=6)
     IdeaActionButton,
-    /// @see HeaderToolbarButtonLook: main toolbar (arc=12, focus-only border)
+    /// @see HeaderToolbarButtonLook: main toolbar (arc=8, focus-only border, compact)
     HeaderToolbar,
     /// @see SquareStripeButtonLook: tool window stripe (arc=8/12)
     SquareStripe,
@@ -331,17 +331,17 @@ pub fn idea_action_button_look() -> ButtonLookParams {
 pub fn header_toolbar_button_look(icon_size_override: Option<u32>) -> ButtonLookParams {
     ButtonLookParams {
         kind: ButtonLookKind::HeaderToolbar,
-        button_arc: 12,
-        icon_size: icon_size_override.unwrap_or(20),
-        minimum_button_size: Size::new(30, 30),
-        preferred_button_size: Size::new(30, 30),
+        button_arc: 8,
+        icon_size: icon_size_override.unwrap_or(18),
+        minimum_button_size: Size::new(26, 26),
+        preferred_button_size: Size::new(26, 26),
         suppress_border: true,
         focus_only_border: true,
         focus_border_width: 2,
         focus_border_color: "var(--ide-focus-color)".into(),
-        background_arc: 12,
+        background_arc: 8,
         disable_filter: "lightThemeDarkHeader".into(),
-        icon_insets: Insets::new(6, 5, 4, 5),
+        icon_insets: Insets::new(4, 4, 4, 4),
         component_insets: Insets::new(0, 0, 0, 0),
     }
 }
@@ -351,15 +351,15 @@ pub fn header_toolbar_button_look(icon_size_override: Option<u32>) -> ButtonLook
 pub fn square_stripe_button_look() -> ButtonLookParams {
     ButtonLookParams {
         kind: ButtonLookKind::SquareStripe,
-        button_arc: 8,
-        icon_size: 20,
-        minimum_button_size: Size::new(37, 40),
-        preferred_button_size: Size::new(37, 40),
+        button_arc: 6,
+        icon_size: 18,
+        minimum_button_size: Size::new(33, 34),
+        preferred_button_size: Size::new(33, 34),
         suppress_border: false,
         focus_only_border: false,
         focus_border_width: 2,
         focus_border_color: "var(--ide-focus-color)".into(),
-        background_arc: 8,
+        background_arc: 6,
         disable_filter: "default".into(),
         icon_insets: Insets::new(0, 0, 0, 0),
         component_insets: Insets::new(0, 0, 0, 0),
@@ -373,17 +373,17 @@ pub fn square_stripe_button_look() -> ButtonLookParams {
 pub fn run_widget_button_look() -> ButtonLookParams {
     ButtonLookParams {
         kind: ButtonLookKind::RunWidget,
-        button_arc: 12,
-        icon_size: 20,
-        minimum_button_size: Size::new(30, 30),
-        preferred_button_size: Size::new(30, 30),
+        button_arc: 8,
+        icon_size: 18,
+        minimum_button_size: Size::new(26, 26),
+        preferred_button_size: Size::new(26, 26),
         suppress_border: true,
         focus_only_border: true,
         focus_border_width: 2,
         focus_border_color: "var(--ide-focus-color)".into(),
-        background_arc: 12,
+        background_arc: 8,
         disable_filter: "lightThemeDarkHeader".into(),
-        icon_insets: Insets::new(6, 5, 4, 5),
+        icon_insets: Insets::new(4, 4, 4, 4),
         component_insets: Insets::new(0, 0, 0, 0),
     }
 }
